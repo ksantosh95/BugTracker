@@ -1,40 +1,40 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, render_template
 from flask_sqlalchemy import SQLAlchemy
 import os
 
 
+
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://postgres:postgres@localhost:5432/test"
+app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://postgres:postgres@localhost:5432/bugtrackerdb"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
-from models import Result
+@app.after_request
+def after_request(response):
+    response.headers.add('Access-Control-Allow-Headers',
+                             'Content-Type, Authorization')
+    response.headers.add('Access-Control-Allow-Methods',
+                             'GET, PATCH, POST, DELETE, OPTIONS')
+    return response
 
 
-@app.route('/')
-def insert():
-    try:
-        entry = Result("xyz",987)
-        db.session.add(entry)
-        db.session.commit()
-    except:
-        db.session.rollback()
-        print("error")
-    finally:
-        db.session.close()
-        print("closed")
-        return ""
 
-    
+from models.TicketModel import Ticket
+
+from controllers import SubmitterController
+
+@app.route("/asd")
+def test():
+    return render_template('TicketForm.html')
 
 
-@app.route('/temp')
-def retrieve():
-    res = Result.query.all()
-    res = [r.format() for r in res]
-    return jsonify(res)
-
-    
+@app.errorhandler(500)
+def error_500(error):
+    return jsonify({
+    'success': False,
+    'error': 500,
+    'message': 'Server side error'
+    }), 500
 
 
 if __name__ == '__main__':
