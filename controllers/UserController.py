@@ -1,4 +1,5 @@
 from flask import Flask, jsonify, request, abort, render_template, redirect, url_for, session
+from flask_cors import cross_origin
 from app import app, db
 import os, sys
 from datetime import date
