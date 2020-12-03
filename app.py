@@ -59,6 +59,10 @@ def logout():
 
 
 from models.TicketModel import Ticket
+from models.EmployeeModel import Employee
+from models.ProjectModel import Project
+from models.EmpProjMapModel import Map_emp_proj
+
 
 from controllers import UserController
 
