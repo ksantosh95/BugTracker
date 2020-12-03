@@ -1,17 +1,17 @@
 <br />
 <p align="center">
   <a href="#">
-    Bug Tracker
+    Bug Tracker - In Progress
   </a>
 
 
   <p align="center">
-    <a href="https://bugvilla.herokuapp.com">View Demo</a>
+    
 
   </p>
 </p>
 
-<p align="center">Universal bug tracker for everyone! BugVilla allows team members to collaborate, discuss and kill bugs effectively.</p>
+<p align="center">Bug Tracking software.</p>
 
 <div align ="center">
 <h3>Features </h3>
