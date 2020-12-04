@@ -6,7 +6,7 @@ import constants
 from authlib.integrations.flask_client import OAuth
 from six.moves.urllib.parse import urlencode
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder='templates')
 #app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://postgres:postgres@localhost:5432/bugtrackerdb"
 # FOR HEROKU DATABASE
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
