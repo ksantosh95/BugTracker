@@ -232,16 +232,22 @@ cursor: pointer;
             <label for="t_desc"> Description<span>*</span></label>
             <input id="t_desc" type="text" name="t_desc" />
           </div>
- <div class="item">
-            <label for="p_id">Project<span>*</span></label>
-            <input id="p_id" type="text"   name="p_id" />
-          </div>
+
   <div class="item">
             <label for="t_priority">Priority<span>*</span></label>
 			<select name="t_priority" id="t_priority">
 			  <option value="High">High</option>
 			  <option value="Medium">Medium</option>
 			  <option value="Low">Low</option>
+			</select>
+          </div>
+<div class="item">
+            <label for="project">Project<span>*</span></label>
+			<select name="project" id="project">
+			{% for proj in project %}
+			  <option value={{ proj.id }}>{{ proj.name }}</option>
+			  {% endfor %}
+			  
 			</select>
           </div>
   <div class="item">

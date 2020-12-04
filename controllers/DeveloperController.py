@@ -2,50 +2,36 @@ from flask import Flask, jsonify, request, abort, render_template, redirect, url
 from app import app, db
 import os, sys
 from datetime import date
-
+from sqlalchemy import text
 
 from models.TicketModel import Ticket
+from models.ProjectModel import Project
+
 
 
 @app.route('/dev/tickets', methods=['GET'])
-def get_tickets():
+def dev_get_tickets():
     userinfo = session.get('profile')
-    ticket_value = Ticket.query.filter_by(submitter_email= userinfo['name']).all()
-    ticket_value = [t.json_format() for t in ticket_value]
+    dev_email= userinfo['name']
+    sql = text("""SELECT tick.t_id, tick.t_title, tick.t_desc, tick.emp_id, tick.submitter_email, tick.p_id, tick.t_priority, tick.t_status, tick.t_type, tick.t_create_date, tick.t_close_date
+                    FROM   ticket tick 
+                        INNER JOIN (SELECT map.p_id 
+                                    FROM   map_emp_proj map 
+                                            INNER JOIN (SELECT * 
+                                                        FROM   employee 
+                                                        WHERE  emp_email = '""" + dev_email+ """') emp 
+                                                    ON map.emp_id = emp.emp_id) filter 
+                                ON tick.p_id = filter.p_id  """)
+    result = db.session.execute(sql)
+    names = [row for row in result]
+    ticket_value = [Ticket.array_to_json_format(row) for row in names]
     return render_template('tickets.html', ticket = ticket_value, userinfo = userinfo)
 
 
-@app.route("/createticket")
-def create_ticket():
-    return render_template('ticketform.html')
-
-
-@app.route('/ticketsubmit', methods=['POST'])
-def submit_ticket():
-    profile = session.get('profile')
-    t_title = request.form.get('t_title')
-    t_desc = request.form.get('t_desc')
-    emp_id = 0
-    submitter_email = profile['name']
-    #p_id = request.form.get('p_id')
-    p_id = 1000
-    t_priority = request.form.get('t_priority')
-    t_status = "open"
-    t_type = request.form.get('t_type')
-    today = date.today()
-    t_create_date = today.strftime("%d/%m/%Y")
-    t_close_date = "N/A"
-   
-    ticket_entry = Ticket(t_title,t_desc,emp_id,submitter_email,p_id,t_priority,t_status,t_type,t_create_date,t_close_date)
-    try:
-        ticket_entry.insert()
-    except:
-        print(sys.exc_info())
-        abort(500)
-
-    return redirect(url_for('get_tickets'))
-    
-
-
 
     
+
+@app.route('/dev/logout')
+def dev_logout():
+    return redirect(url_for('logout'))
+

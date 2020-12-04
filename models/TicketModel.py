@@ -47,6 +47,21 @@ class Ticket(db.Model):
         
         }
 
+    def array_to_json_format(self):
+        return {
+            "id": self[0],
+            "title":self[1],
+            "desc":self[2],
+            "emp_id":self[3],
+            "submitter_email":self[4],
+            "p_id":self[5],
+            "priority":self[6],
+            "status":self[7],
+            "type":self[8],
+            "create_date":self[9],
+            "close_date":self[10]
+        }
+
 
     def insert(self):
         db.session.add(self)

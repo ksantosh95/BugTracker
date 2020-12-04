@@ -1,6 +1,6 @@
-from flask import Flask, jsonify, render_template, redirect, session, url_for
+from flask import Flask, jsonify, render_template, redirect, session, url_for, abort
 from flask_sqlalchemy import SQLAlchemy
-import os
+import os,sys
 from os import environ as env
 import constants
 from authlib.integrations.flask_client import OAuth
@@ -58,6 +58,7 @@ def logout():
     return redirect(auth0.api_base_url + '/v2/logout?' + urlencode(params))
 
 
+
 from models.TicketModel import Ticket
 from models.EmployeeModel import Employee
 from models.ProjectModel import Project
@@ -65,8 +66,8 @@ from models.EmpProjMapModel import Map_emp_proj
 
 
 from controllers import UserController
-
-
+from controllers import DeveloperController
+from controllers import CreateTicketController
 
 
 @app.route('/callback')
@@ -74,12 +75,18 @@ def callback_handling():
     auth0.authorize_access_token()
     resp = auth0.get('userinfo')
     userinfo = resp.json()
-    
+    try :
+        role = Employee.query.with_entities(Employee.emp_role).filter_by(emp_email = userinfo['name']).one()
+    except:
+        print(sys.exc_info())
+        abort(500)
+
     session['profile'] = {
        'name': userinfo['name'],
-       'nickname' : userinfo['nickname']
+       'nickname' : userinfo['nickname'],
+       'role' : role
     }
-    return redirect('/tickets')
+    return redirect('/dev/tickets')
 
 
 
