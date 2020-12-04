@@ -15,6 +15,8 @@ db = SQLAlchemy(app)
 app.secret_key = "asdfsdfsd"
 
 
+
+
 @app.after_request
 def after_request(response):
     response.headers.add('Access-Control-Allow-Headers',
@@ -23,15 +25,12 @@ def after_request(response):
                              'GET, PATCH, POST, DELETE, OPTIONS')
     return response
 
-AUTH0_DOMAIN = 'ksantosh95.us.auth0.com'
-AUTH0_CLIENT_ID = 'ui6xQlOy9NVhh31d0w8UvPjSpaMrZKLS'
-AUTH0_CALLBACK_URL= 'http://127.0.0.1:5000/callback'
-#HEROKU DEPLOYMENT
-#AUTH0_CALLBACK_URL= 'https://bugtracker-stage.herokuapp.com/callback'
-
-AUTH0_CLIENT_SECRET = 'RgE624251yW7O3WBEbYCR3DAB-q0IEk-L-Q1-jqM9_5q7dELbzYvzEbkwUxGayBp'
+AUTH0_DOMAIN = constants.AUTH0_DOMAIN
+AUTH0_CLIENT_ID = constants.AUTH0_CLIENT_ID
+AUTH0_CALLBACK_URL= constants.AUTH0_CALLBACK_URL
+AUTH0_CLIENT_SECRET = constants.AUTH0_CLIENT_SECRET
 AUTH0_BASE_URL = 'https://' + AUTH0_DOMAIN
-AUTH0_AUDIENCE = 'bugTracker'
+AUTH0_AUDIENCE = constants.AUTH0_AUDIENCE
 
 oauth = OAuth(app)
 
