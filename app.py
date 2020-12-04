@@ -25,7 +25,9 @@ def after_request(response):
 
 AUTH0_DOMAIN = 'ksantosh95.us.auth0.com'
 AUTH0_CLIENT_ID = 'ui6xQlOy9NVhh31d0w8UvPjSpaMrZKLS'
-AUTH0_CALLBACK_URL= 'http://127.0.0.1:5000/callback'
+#AUTH0_CALLBACK_URL= 'http://127.0.0.1:5000/callback'
+#HEROKU DEPLOYMENT
+AUTH0_CALLBACK_URL= 'https://bugtracker-stage.herokuapp.com/callback'
 
 AUTH0_CLIENT_SECRET = 'RgE624251yW7O3WBEbYCR3DAB-q0IEk-L-Q1-jqM9_5q7dELbzYvzEbkwUxGayBp'
 AUTH0_BASE_URL = 'https://' + AUTH0_DOMAIN
