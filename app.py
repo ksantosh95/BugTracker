@@ -8,7 +8,8 @@ from six.moves.urllib.parse import urlencode
 
 app = Flask(__name__)
 #app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://postgres:postgres@localhost:5432/bugtrackerdb"
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ('DATABASE_URL')
+# FOR HEROKU DATABASE
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 app.secret_key = "asdfsdfsd"
