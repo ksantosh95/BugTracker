@@ -63,6 +63,7 @@ def logout():
 
 
 from models.TicketModel import Ticket
+from models.Ticket_DetailModel import Ticket_detail
 from models.EmployeeModel import Employee
 from models.ProjectModel import Project
 from models.EmpProjMapModel import Map_emp_proj
@@ -70,7 +71,7 @@ from models.EmpProjMapModel import Map_emp_proj
 
 from controllers import UserController
 from controllers import DeveloperController
-from controllers import CreateTicketController
+from controllers import TicketController
 
 
 @app.route('/callback')

@@ -13,7 +13,14 @@ def user_get_tickets():
     userinfo = session.get('profile')
     ticket_value = Ticket.query.filter_by(submitter_email= userinfo['name']).all()
     ticket_value = [t.json_format() for t in ticket_value]
-    return render_template('tickets.html', ticket = ticket_value, userinfo = userinfo)
+    data = {
+        "ticket" : ticket_value,
+        "userinfo" : userinfo,
+        "role" : userinfo['role'],
+        "username" : userinfo['nickname'],
+        "page" : "tickets"
+    }
+    return render_template('tickets.html', data = data)
 
 
     

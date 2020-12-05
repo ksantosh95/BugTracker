@@ -1,7 +1,11 @@
 insert into employee(emp_id,emp_name,emp_email,emp_pwd, emp_role,update_date) values (1,'Alice','alice@gmail.com','bugTracker','Developer','03-12-2020');
+insert into employee(emp_id,emp_name,emp_email,emp_pwd, emp_role,update_date) values (2,'Bob','bob@gmail.com','bugTracker','Developer','03-12-2020');
 
 insert into project(p_id,p_name,p_desc,p_start_date, p_end_date) values (1000,'bug_tracker','web based tool for tracking program bugs','03-12-2020','');
 
 insert into map_emp_proj(map_id,emp_id,p_id,emp_role, emp_assign_date, emp_end_date) values (1,1,1000,'Developer','03-12-2020','');
 
 insert into ticket(t_id,t_title, t_desc, emp_id, submitter_email, p_id, t_priority, t_status, t_type, t_create_date, t_close_date) values (1,'Test','tesing the functionality',1,'alice@gmail.com',1000,'Low','Open','Test','04-12-2020','');
+
+
+insert into ticket_detail(t_detail_id, t_id,emp_id, t_status, t_update_date, t_comment) values (1000,1,2,'Open','04-12-2020','Assigned developer');

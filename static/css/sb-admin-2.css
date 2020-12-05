@@ -2301,7 +2301,7 @@ textarea.form-control {
 .btn {
   display: inline-block;
   font-weight: 400;
-  color: #D2691E;
+  color: #FF5733;
   text-align: center;
   vertical-align: middle;
   -webkit-user-select: none;
@@ -2459,8 +2459,8 @@ fieldset:disabled a.btn {
 
 .btn-info {
   color: #fff;
-  background-color: #FF8C00;
-  border-color: #FF8C00;
+  background-color: #DE9129;
+  border-color: #DE9129;
 }
 
 .btn-info:hover {
@@ -6374,7 +6374,7 @@ a.close.disabled {
 }
 
 .bg-primary {
-  background-color: #D2691E!important;
+  background-color: #1F1811!important;
 }
 
 a.bg-primary:hover, a.bg-primary:focus,

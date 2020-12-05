@@ -1,0 +1,55 @@
+<!-- DataTales Example -->
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary">
+							
+							{% if data.page == 'ticket_detail' %}
+							Ticket Details
+							{% elif data.page == 'tickets' %}
+							Tickets
+							{% endif %}
+							
+							
+							</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                                    <thead>
+                                        <tr>
+                                            <th>Ticket Id</th>
+                                            <th>Title</th>
+                                            <th>Description</th>
+											{% if data.page == 'ticket_detail' %}<th>Developer</th>{% endif %}
+                                            <th>Project</th>
+                                            <th>Priority</th>
+                                            <th>Status</th>
+											<th>Type</th>
+											<th>Create Date</th>
+											<th>Closed Date</th>
+											{% if data.page != 'ticket_detail' %}<th></th>{% endif %}
+                                        </tr>
+                                    </thead>
+                                    
+                                    <tbody>
+									{% for t in data.ticket %}
+                                        <tr>
+                                            <td>{{ t.id }}</td>
+                                            <td>{{ t.title }}</td>
+                                            <td>{{ t.desc }}</td>
+											{% if data.page == 'ticket_detail' %}<td>{{ t.emp_id }}</td>{% endif %}
+                                            <td>{{ t.p_id }}</td>
+                                            <td>{{ t.priority }}</td>
+                                            <td>{{ t.status }}</td>
+											<td>{{ t.type }}</td>
+                                            <td>{{ t.create_date }}</td>
+                                            <td>{{ t.close_date }}</td>
+											{% if data.page != 'ticket_detail' %}<td><a href="/ticketdetails/{{t.id}}" >Details</a></td>{% endif %}
+                                        </tr>
+                                    {% endfor %}    
+                                        
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>

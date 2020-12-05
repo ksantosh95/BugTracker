@@ -244,7 +244,7 @@ cursor: pointer;
 <div class="item">
             <label for="project">Project<span>*</span></label>
 			<select name="project" id="project">
-			{% for proj in project %}
+			{% for proj in data.project %}
 			  <option value={{ proj.id }}>{{ proj.name }}</option>
 			  {% endfor %}
 			  
