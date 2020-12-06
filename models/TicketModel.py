@@ -6,7 +6,7 @@ class Ticket(db.Model):
     t_id = db.Column(db.Integer, primary_key=True)
     t_title = db.Column(db.String(40))
     t_desc = db.Column(db.String(100))
-    emp_id = db.Column(db.Integer)
+    assigned_user_id = db.Column(db.Integer)
     submitter_email = db.Column(db.String)
     p_id = db.Column(db.Integer)
     t_priority = db.Column(db.String(40))
@@ -15,10 +15,10 @@ class Ticket(db.Model):
     t_create_date = db.Column(db.String(40))
     t_close_date = db.Column(db.String(40))
 
-    def __init__(self, t_title, t_desc, emp_id, submitter_email, p_id, t_priority, t_status, t_type, t_create_date, t_close_date):
+    def __init__(self, t_title, t_desc, assigned_user_id, submitter_email, p_id, t_priority, t_status, t_type, t_create_date, t_close_date):
         self.t_title = t_title
         self.t_desc = t_desc
-        self.emp_id = emp_id
+        self.assigned_user_id = assigned_user_id
         self.submitter_email = submitter_email
         self.p_id = p_id
         self.t_priority = t_priority
@@ -36,7 +36,7 @@ class Ticket(db.Model):
             "id":self.t_id,
             "title":self.t_title,
             "desc":self.t_desc,
-            "emp_id":self.emp_id,
+            "user_id":self.assigned_user_id,
             "submitter_email":self.submitter_email,
             "p_id":self.p_id,
             "priority":self.t_priority,
@@ -52,7 +52,7 @@ class Ticket(db.Model):
             "id": self[0],
             "title":self[1],
             "desc":self[2],
-            "emp_id":self[3],
+            "user_id":self[3],
             "submitter_email":self[4],
             "p_id":self[5],
             "priority":self[6],

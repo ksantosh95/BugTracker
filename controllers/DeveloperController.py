@@ -16,7 +16,7 @@ def dev_get_tickets():
     sql = text("""SELECT tick.t_id, 
                     tick.t_title, 
                     tick.t_desc, 
-                    tick.emp_id, 
+                    tick.assigned_user_id, 
                     tick.submitter_email, 
                     proj.p_name AS p_id, 
                     tick.t_priority, 
@@ -26,12 +26,12 @@ def dev_get_tickets():
                     tick.t_close_date 
                 FROM   ticket tick 
                     INNER JOIN (SELECT map.p_id 
-                                FROM   map_emp_proj map 
+                                FROM   map_user_proj map 
                                         INNER JOIN (SELECT * 
-                                                    FROM   employee 
-                                                    WHERE  emp_email = '""" + dev_email+ """') 
-                                                    emp 
-                                                ON map.emp_id = emp.emp_id) filter 
+                                                    FROM   users 
+                                                    WHERE  user_email = '""" + dev_email+ """') 
+                                                    u 
+                                                ON map.user_id = u.user_id) filter 
                             ON tick.p_id = filter.p_id 
                     INNER JOIN project proj 
                             ON tick.p_id = proj.p_id """)
@@ -50,8 +50,3 @@ def dev_get_tickets():
 
 
     
-
-@app.route('/dev/logout')
-def dev_logout():
-    return redirect(url_for('logout'))
-

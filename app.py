@@ -63,16 +63,18 @@ def logout():
 
 
 from models.TicketModel import Ticket
-from models.Ticket_DetailModel import Ticket_detail
-from models.EmployeeModel import Employee
+from models.Ticket_HistoryModel import Ticket_history
+from models.UsersModel import Users
 from models.ProjectModel import Project
-from models.EmpProjMapModel import Map_emp_proj
+from models.UserProjMapModel import Map_user_proj
+from models.CommentModel import Comment
+
 
 
 from controllers import UserController
 from controllers import DeveloperController
 from controllers import TicketController
-
+from controllers import CommentController
 
 @app.route('/callback')
 def callback_handling():
@@ -80,7 +82,7 @@ def callback_handling():
     resp = auth0.get('userinfo')
     userinfo = resp.json()
     try :
-        role = Employee.query.with_entities(Employee.emp_role).filter_by(emp_email = userinfo['name']).one()
+        role = Users.query.with_entities(Users.user_role).filter_by(user_email = userinfo['name']).one()
     except:
         print(sys.exc_info())
         abort(500)
@@ -88,7 +90,8 @@ def callback_handling():
     session['profile'] = {
        'name': userinfo['name'],
        'nickname' : userinfo['nickname'],
-       'role' : role
+       'role' : role,
+       'email': userinfo['email']
     }
     return redirect('/dev/tickets')
 

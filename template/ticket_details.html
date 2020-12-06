@@ -32,38 +32,85 @@
 					{%- include('/includes/ticket_table.html') %}
 					
 					<hr>
-					<!-- DataTales Example -->
-                    <div class="card shadow mb-4">
-                        <div class="card-header py-3">
-                            <h6 class="m-0 font-weight-bold text-primary">History for Ticket</h6>
-                        </div>
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                                    <thead>
-                                        <tr>
-                                            <th>Developer</th>
-                                            <th>Status</th>
-                                            <th>Last Updated Date</th>
-                                            <th>Comments</th>
-                                        </tr>
-                                    </thead>
-                                    
-                                    <tbody>
-									{% for t in data.ticket_detail %}
-                                        <tr>
-                                            <td>{{ t.emp_id }}</td>
-                                            <td>{{ t.status }}</td>
-                                            <td>{{ t.update_date }}</td>
-                                            <td>{{ t.comment }}</td>
-                                        </tr>
-                                    {% endfor %}    
-                                        
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
+					
+					<div class="testbox">
+						  <form action="/submitcomment" method="POST">
+
+							<br/>
+							<fieldset>
+							  <h5>Add Comment</h5>
+							   <div class="colums">
+							  <div class="item">
+								<input id="comment" type="text" name="comment" size="50"/>
+								{% for t in data.ticket_history %}
+								<input id="ticket_id" type="hidden" name="ticket_id" value="{{t.id}}" />
+								{% endfor%}
+								<button type="submit" href="/">Submit</button>
+							  </div>
+
+							  </div>
+									</fieldset>
+							
+						  </form>
+    </div>
+					
+					<hr>
+					
+					
+					<div class="row">
+					
+						<!-- Ticket history -->
+						<div class="detailscard shadow mb-4 ml-2">
+							<div class="card-header py-3">
+								<h6 class="m-0 font-weight-bold text-primary">History for Ticket</h6>
+							</div>
+							<div class="card-body">
+								<div class="table-responsive">
+									<table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+										<thead>
+											<tr>
+												<th>Developer</th>
+												<th>Status</th>                                         
+												<th>Priority</th>
+												<th>Last Updated Date</th>
+											</tr>
+										</thead>
+										
+										<tbody>
+										{% for t in data.ticket_history %}
+											<tr>
+												<td>{{ t.user_id }}</td>
+												<td>{{ t.status }}</td>
+												<td>{{ t.priority }}</td>
+												<td>{{ t.update_date }}</td>
+											</tr>
+										{% endfor %}    
+											
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</div>
+						
+					
+						
+						<!-- Comments -->
+						<div class="detailscard shadow mb-4 ml-4 mr-0">
+							<div class="card-header py-3">
+								<h6 class="m-0 font-weight-bold text-primary">Comments</h6>
+							</div>
+							<div class="card-body">
+								<ul id="comments">
+								{% for comm in data.comment %}
+									<li>   {{comm.comment}} <br> -- {{comm.user_id}}, {{comm.date}} </li> 
+								{% endfor %}
+								</ul>
+							</div>
+						</div>
+						
+					</div>
+					
+					
                 </div>
                 <!-- /.container-fluid -->
 

@@ -6,7 +6,9 @@ from sqlalchemy import text
 
 from models.TicketModel import Ticket
 from models.ProjectModel import Project
-from models.Ticket_DetailModel import Ticket_detail
+from models.Ticket_HistoryModel import Ticket_history
+from models.CommentModel import Comment
+from models.UsersModel import Users
 
 
 @app.route("/createticket")
@@ -29,7 +31,7 @@ def submit_ticket():
     profile = session.get('profile')
     t_title = request.form.get('t_title')
     t_desc = request.form.get('t_desc')
-    emp_id = 0
+    user_id = 0
     submitter_email = profile['name']
     p_id = request.form.get('project')
     t_priority = request.form.get('t_priority')
@@ -39,7 +41,7 @@ def submit_ticket():
     t_create_date = today.strftime("%d/%m/%Y")
     t_close_date = "N/A"
    
-    ticket_entry = Ticket(t_title,t_desc,emp_id,submitter_email,p_id,t_priority,t_status,t_type,t_create_date,t_close_date)
+    ticket_entry = Ticket(t_title,t_desc,user_id,submitter_email,p_id,t_priority,t_status,t_type,t_create_date,t_close_date)
     try:
         ticket_entry.insert()
     except:
@@ -56,32 +58,32 @@ def submit_ticket():
 
 
 @app.route("/ticketdetails/<int:ticket_id>")
-def get_ticket_details(ticket_id):
-    sql = text("""SELECT tick_detail.t_id, 
-                        filter.emp_name as emp_id, 
-                        tick_detail.t_status, 
-                        tick_detail.t_update_date, 
-                        tick_detail.t_comment 
-                    FROM   ticket_detail tick_detail 
-                        INNER JOIN (SELECT emp.emp_name, 
+def get_ticket_history(ticket_id):
+    sql = text("""SELECT tick_history.t_id, 
+                        filter.user_name as user_id, 
+                        tick_history.t_status, 
+                        tick_history.t_update_date, 
+                        tick_history.t_priority 
+                    FROM   ticket_history tick_history 
+                        INNER JOIN (SELECT u.user_name, 
                                             tick.t_id 
-                                    FROM   employee emp 
-                                            INNER JOIN (SELECT emp_id, 
+                                    FROM   users u 
+                                            INNER JOIN (SELECT assigned_user_id, 
                                                                 t_id 
                                                         FROM   ticket 
                                                         WHERE  t_id = """ + str(ticket_id)+""") tick 
-                                                    ON emp.emp_id = tick.emp_id) filter 
-                                ON tick_detail.t_id = filter.t_id   """)
+                                                    ON u.user_id = tick.assigned_user_id) filter 
+                                ON tick_history.t_id = filter.t_id   """)
     result = db.session.execute(sql)
-    ticket_detail_list = [row for row in result]
-    ticket_detail = [Ticket_detail.json_format(row) for row in ticket_detail_list]
+    ticket_history_list = [row for row in result]
+    ticket_history = [Ticket_history.json_format(row) for row in ticket_history_list]
 
     userinfo = session.get('profile')
 
     sql_ticket = text(""" SELECT tick.t_id, 
                             tick.t_title, 
                             tick.t_desc, 
-                            emp.emp_name AS emp_id, 
+                            u.user_name AS assigned_user_id, 
                             tick.submitter_email, 
                             proj.p_name  AS p_id, 
                             tick.t_priority, 
@@ -92,21 +94,26 @@ def get_ticket_details(ticket_id):
                         FROM   ticket tick 
                             INNER JOIN project proj 
                                     ON tick.p_id = proj.p_id 
-                            INNER JOIN employee emp 
-                                    ON emp.emp_id = tick.emp_id 
+                            LEFT OUTER JOIN users u 
+                                    ON u.user_id = tick.assigned_user_id 
                         WHERE  tick.t_id = """+ str(ticket_id)+ """  """)
     result_ticket = db.session.execute(sql_ticket)
     ticket_list = [row for row in result_ticket]
     ticket = [Ticket.json_format(row) for row in ticket_list]
 
+    comment_list = Comment.query.join(Users, Comment.user_id==Users.user_id)\
+                .add_columns(Comment.t_id, Comment.comment, Comment.date, Users.user_name.label('user_id'))\
+                .filter(Comment.t_id==ticket_id).all()
+    comment = [Comment.json_format(row) for row in comment_list]
 
     data = {
         "ticket" : ticket,
-        "ticket_detail" : ticket_detail,
+        "ticket_history" : ticket_history,
         "userinfo" : userinfo,
         "role" : userinfo['role'],
         "username" : userinfo['nickname'],
-        "page" : "ticket_detail"
+        "page" : "ticket_detail",
+        "comment" : comment
     }
     return render_template('ticket_details.html', data = data )
 
