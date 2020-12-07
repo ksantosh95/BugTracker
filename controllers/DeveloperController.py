@@ -6,7 +6,8 @@ from sqlalchemy import text
 
 from models.TicketModel import Ticket
 from models.ProjectModel import Project
-
+from models.UserProjMapModel import Map_user_proj
+from models.UsersModel import Users
 
 
 @app.route('/dev/tickets', methods=['GET'])
@@ -45,8 +46,24 @@ def dev_get_tickets():
         "username" : userinfo['nickname'],
         "page" : "tickets"
     }
-    return render_template('tickets.html', data = data)
-
-
-
     
+    return render_template('mainpage.html', data = data)
+
+
+@app.route('/dev/projects', methods=['GET'])
+def dev_get_projects():
+    userinfo = session.get('profile')
+    dev_email= userinfo['email']
+    project_list = Project.query.join(Map_user_proj, Project.p_id == Map_user_proj.p_id)\
+				.join(Users, Users.user_id == Map_user_proj.user_id)\
+				.add_columns(Project.p_id,Project.p_name,Project.p_desc,Project.p_start_date,Project.p_end_date)\
+				.filter(Users.user_email == dev_email).all()
+    project = [Project.json_format(proj) for proj in project_list]   
+    data = {
+        "userinfo" : userinfo,
+        "role" : userinfo['role'],
+        "username" : userinfo['nickname'],
+        "page" : "projects",
+        "project" : project
+    }
+    return render_template('mainpage.html', data = data)

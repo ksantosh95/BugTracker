@@ -4474,6 +4474,17 @@ input[type="button"].btn-block {
   border-radius: 0.35rem;
 }
 
+.desc_card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 48%;
+  word-wrap: break-word;
+  background-color: #fff;
+  background-clip: border-box;
+  border-radius: 0.35rem;
+}
+
 .card > hr {
   margin-right: 0;
   margin-left: 0;

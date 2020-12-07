@@ -75,6 +75,7 @@ from controllers import UserController
 from controllers import DeveloperController
 from controllers import TicketController
 from controllers import CommentController
+from controllers import ProjectController
 
 @app.route('/callback')
 def callback_handling():

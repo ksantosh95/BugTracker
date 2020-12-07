@@ -25,15 +25,27 @@
                 {%- include('/includes/topbar.html') %}
 
                 <!-- Begin Page Content -->
-                <div class="container-fluid">
-
-                    <!-- Page Heading -->
-					<a href="/createticket" class="btn btn-info btn-icon-split">
-                                        
-                                        <span class="text">Create Ticket</span>
-                                    </a>
+					<div class="container-fluid">
+						{% if data.page == 'tickets' %}
+						<!-- Page Heading -->
+						<div class="row">
+						<a href="/createticket" class="btn btn-info btn-icon-split ml-3 mr-2" >
+							<span class="text">Create Ticket</span>
+						</a>
+						{% if data.role!= 'User' %}
+						<a href="mytickets" class="btn btn-info btn-icon-split ml-3 mr-2">
+							<span class="text">My Tickets</span>
+						{% endif %}
+						</a>
+					</div>
 					<hr>
 					{%- include('/includes/ticket_table.html') %}
+					
+					{% elif data.page == 'projects' %}
+					
+					{%- include('/includes/project_list.html') %}
+					
+					{% endif %}
                 </div>
                 <!-- /.container-fluid -->
 

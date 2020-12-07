@@ -6,10 +6,14 @@ insert into users values (2,'Bob','bob@gmail.com','bugTracker','Developer','03/1
 PROJECT
 -------
 insert into project values (1,'bug_tracker','web based tool for tracking program bugs','03/12/2020','');
+insert into project values (2,'Test project','Test project','03/12/2020','');
+
 
 MAP_USER_PROJ
 -------
 insert into map_user_proj  values (1,1,1,'Developer','03/12/2020','');
+insert into map_user_proj  values (2,1,2,'Developer','03/12/2020','');
+
 
 
 TICKET

@@ -48,6 +48,14 @@ def submit_ticket():
         print(sys.exc_info())
         abort(500)
     
+    ticket_id = ticket_entry.t_id
+    ticket_history_entry = Ticket_history(ticket_id,user_id,t_status,t_create_date,t_priority)
+    try:
+        ticket_history_entry.insert()
+    except:
+        print(sys.exc_info())
+        abort(500)
+
     
     if profile['role'][0] == 'Developer':
         return redirect(url_for('dev_get_tickets'))
@@ -58,7 +66,7 @@ def submit_ticket():
 
 
 @app.route("/ticketdetails/<int:ticket_id>")
-def get_ticket_history(ticket_id):
+def get_ticket_details(ticket_id):
     sql = text("""SELECT tick_history.t_id, 
                         filter.user_name as user_id, 
                         tick_history.t_status, 
@@ -68,7 +76,7 @@ def get_ticket_history(ticket_id):
                         INNER JOIN (SELECT u.user_name, 
                                             tick.t_id 
                                     FROM   users u 
-                                            INNER JOIN (SELECT assigned_user_id, 
+                                            RIGHT OUTER JOIN (SELECT assigned_user_id, 
                                                                 t_id 
                                                         FROM   ticket 
                                                         WHERE  t_id = """ + str(ticket_id)+""") tick 

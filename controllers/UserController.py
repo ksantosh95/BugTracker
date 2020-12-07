@@ -20,7 +20,7 @@ def user_get_tickets():
         "username" : userinfo['nickname'],
         "page" : "tickets"
     }
-    return render_template('tickets.html', data = data)
+    return render_template('mainpage.html', data = data)
 
 
     

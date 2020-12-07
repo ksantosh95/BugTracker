@@ -1,0 +1,20 @@
+<div class="row">
+{% for proj in data.project %}
+	<div class="detailscard shadow mb-4 ml-2 mr-2">
+		<div class="card-header py-3">
+			<h5 class="m-0 font-weight-bold text-primary">
+			
+			<a href="../projectdetails/{{proj.id}}" >{{ proj.name }}</a>
+		
+			</h5>
+		</div>
+		<div class="card-body">
+			{{ proj.desc }}
+			<br><br>
+			<b> Project Manager </b>
+			<br>
+			Nacho Fer
+		</div>
+	</div>
+{% endfor %}
+</div>
