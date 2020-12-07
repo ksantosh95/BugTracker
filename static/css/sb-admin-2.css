@@ -2298,6 +2298,62 @@ textarea.form-control {
   }
 }
 
+
+.open_btn {
+  display: inline-block;
+  font-weight: 400;
+  color: #FFFFFF;
+  text-align: center;
+  vertical-align: middle;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  background-color: #43609B;
+  border: 1px solid transparent;
+  padding: 0.15rem 0.15rem;
+  font-size: 1rem;
+  line-height: 1;
+  border-radius: 0.35rem;
+}
+
+.progress_btn {
+  display: inline-block;
+  font-weight: 400;
+  color: #FFFFFF;
+  text-align: center;
+  vertical-align: middle;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  background-color: #F6EF24;
+  border: 1px solid transparent;
+  padding: 0.15rem 0.15rem;
+  font-size: 1rem;
+  line-height: 1;
+  border-radius: 0.35rem;
+}
+
+.closed_btn {
+  display: inline-block;
+  font-weight: 400;
+  color: #FFFFFF;
+  text-align: center;
+  vertical-align: middle;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  background-color: #4DD732;
+  border: 1px solid transparent;
+  padding: 0.15rem 0.15rem;
+  font-size: 1rem;
+  line-height: 1;
+  border-radius: 0.35rem;
+}
+
+
 .btn {
   display: inline-block;
   font-weight: 400;
@@ -4482,6 +4538,30 @@ input[type="button"].btn-block {
   word-wrap: break-word;
   background-color: #fff;
   background-clip: border-box;
+  border-radius: 0.35rem;
+}
+
+.usercard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 44%;
+  word-wrap: break-word;
+  background-color: #fff;
+  background-clip: border-box;
+  border: 1px solid #e3e6f0;
+  border-radius: 0.35rem;
+}
+
+.ticketcard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 52%;
+  word-wrap: break-word;
+  background-color: #fff;
+  background-clip: border-box;
+  border: 1px solid #e3e6f0;
   border-radius: 0.35rem;
 }
 

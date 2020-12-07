@@ -19,7 +19,7 @@ insert into map_user_proj  values (2,1,2,'Developer','03/12/2020','');
 TICKET
 --------
 insert into ticket values (1,'Test','tesing the functionality',1,'alice@gmail.com',1,'Low','Open','Test','04/12/2020','');
-
+insert into ticket values (5,'closed button Test','tesing the functionality',1,'bob@gmail.com',1,'Low','Closed','Test','04/12/2020','');
 
 TICKET_HISTORY
 --------

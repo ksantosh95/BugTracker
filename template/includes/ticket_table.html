@@ -45,7 +45,13 @@
 											{% endif %}
                                             <td>{{ t.p_id }}</td>
                                             <td>{{ t.priority }}</td>
-                                            <td>{{ t.status }}</td>
+											{% if t.status =='Open' %}
+												<td ><div class="open_btn  ml-2 mr-2 mt-1 mb-1">{{ t.status }}</div></td>
+											{% elif t.status == 'In progress' %}
+												<td ><div class="progress_btn  ml-2 mr-2 mt-1 mb-1">{{ t.status }}</div></td>
+											{% elif t.status == 'Closed' %}
+												<td ><div class="closed_btn  ml-2 mr-2 mt-1 mb-1">{{ t.status }}</div></td>
+											{% endif %}
 											<td>{{ t.type }}</td>
                                             <td>{{ t.create_date }}</td>
                                             <td>{{ t.close_date }}</td>

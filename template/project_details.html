@@ -48,7 +48,7 @@
 						<div class="row">
 						
 							<!-- Assigned Personnel -->
-							<div class="detailscard shadow mb-4 ml-3">
+							<div class="usercard shadow mb-4 ml-3">
 								<div class="card-header py-3">
 									<h6 class="m-0 font-weight-bold text-primary">Project Personnel</h6>
 								</div>
@@ -80,7 +80,7 @@
 							
 						
 							
-						<div class="detailscard shadow mb-4 ml-3">
+						<div class="ticketcard shadow mb-4 ml-3">
                         <div class="card-header py-3">
                             <h6 class="m-0 font-weight-bold text-primary">
 							Tickets for this Project
@@ -107,7 +107,13 @@
                                         <tr>
                                             <td>{{ t.title }}</td>
 											<td>{{ t.user_id }}</td>
-                                            <td>{{ t.status }}</td>
+                                            {% if t.status =='Open' %}
+												<td ><div class="open_btn  ml-2 mr-2 mt-1 mb-1">{{ t.status }}</div></td>
+											{% elif t.status == 'In progress' %}
+												<td ><div class="progress_btn  ml-2 mr-2 mt-1 mb-1">{{ t.status }}</div></td>
+											{% elif t.status == 'Closed' %}
+												<td ><div class="closed_btn  ml-2 mr-2 mt-1 mb-1">{{ t.status }}</div></td>
+											{% endif %}
                                             <td>{{ t.create_date }}</td>
 											<td><a href="/ticketdetails/{{t.id}}" >Details</a></td>
                                         </tr>

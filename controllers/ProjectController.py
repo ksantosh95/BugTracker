@@ -37,7 +37,7 @@ def get_project_details(project_id):
                     .filter(Map_user_proj.p_id == project_id).all()
     project_users =  [project_user_list_to_json(row) for row in project_users_list]
 
-    project_tickets_list = Ticket.query.join(Users, Ticket.assigned_user_id == Users.user_id)\
+    project_tickets_list = Ticket.query.join(Users, Ticket.assigned_user_id == Users.user_id, isouter=True )\
                         .add_columns(Ticket.t_id,Ticket.t_title,Ticket.t_desc, Users.user_name.label('assigned_user_id'), \
                             Ticket.submitter_email, Ticket.p_id, Ticket.t_priority, Ticket.t_status, Ticket.t_type,\
                                 Ticket.t_create_date, Ticket.t_close_date)\
