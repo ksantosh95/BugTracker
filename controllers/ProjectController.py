@@ -21,7 +21,7 @@ def project_user_list_to_json(self):
 @app.route("/projects")
 def redirect_projects():
     userinfo = session.get('profile')
-    if userinfo['role'][0] == 'Developer':
+    if userinfo['role'] == 'Developer':
         return redirect('/dev/projects')
     return ""
 

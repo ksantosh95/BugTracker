@@ -3,6 +3,7 @@ from app import app, db
 import os, sys
 from datetime import date
 from sqlalchemy import text
+from datetime import datetime
 
 from models.TicketModel import Ticket
 from models.ProjectModel import Project
@@ -39,6 +40,14 @@ def dev_get_tickets():
     result = db.session.execute(sql)
     names = [row for row in result]
     ticket_value = [Ticket.array_to_json_format(row) for row in names]
+
+    today = date.today()
+    t_create_date = today.strftime("%d/%m/%Y")
+    d1 = datetime.strptime(t_create_date, '%d/%m/%Y')
+    for t in ticket_value:
+        d2 = datetime.strptime(t['create_date'], '%d/%m/%Y')
+        t['datediff'] = abs((d2 - d1).days)
+
     data = {
         "ticket" : ticket_value,
         "userinfo" : userinfo,
@@ -80,6 +89,13 @@ def get_dev_assigned_tickets():
                                 .filter(Users.user_role== 'Developer').all()
     ticket = [Ticket.json_format(tick) for tick in ticket_list]  
     
+    today = date.today()
+    t_create_date = today.strftime("%d/%m/%Y")
+    d1 = datetime.strptime(t_create_date, '%d/%m/%Y')
+    for t in ticket:
+        d2 = datetime.strptime(t['create_date'], '%d/%m/%Y')
+        t['datediff'] = abs((d2 - d1).days)
+
     data = {
         "ticket" : ticket,
         "userinfo" : userinfo,
@@ -97,6 +113,13 @@ def get_dev_submitted_tickets():
     ticket_list = Ticket.query.filter_by(submitter_email= userinfo['email']).all()
     ticket = [Ticket.json_format(t) for t in ticket_list]  
     
+    today = date.today()
+    t_create_date = today.strftime("%d/%m/%Y")
+    d1 = datetime.strptime(t_create_date, '%d/%m/%Y')
+    for t in ticket:
+        d2 = datetime.strptime(t['create_date'], '%d/%m/%Y')
+        t['datediff'] = abs((d2 - d1).days)
+
     data = {
         "ticket" : ticket,
         "userinfo" : userinfo,

@@ -1,22 +1,31 @@
 <!-- DataTales Example -->
                     <div class="card shadow mb-4">
+						{% if data.page == 'ticket_detail'  %}
                         <div class="card-header py-3">
                             <h6 class="m-0 font-weight-bold text-primary">
-							
-							{% if data.page == 'ticket_detail' %}
+
 							Ticket Details
-							{% elif data.page == 'tickets' %}
-							Tickets
-							{% endif %}
-							
-							
+	
 							</h6>
                         </div>
+						{% elif data.role == 'User' %}
+						<div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary">
+
+							Tickets
+	
+							</h6>
+                        </div>
+						{% endif %}
                         <div class="card-body">
                             <div class="table-responsive">
-                                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                                <table class="table table-bordered medium" id="dataTable" width="100%" cellspacing="0">
                                     <thead>
                                         <tr>
+											<!--
+											{% if data.page=='tickets' or data.page == 'assignedtickets' or data.page == 'submittedtickets' %}
+											<th>Days since creation</th>-->
+											{% endif %}
                                             <th>Ticket Id</th>
                                             <th>Title</th>
                                             <th>Description</th>
@@ -36,6 +45,9 @@
                                     <tbody>
 									{% for t in data.ticket %}
                                         <tr>
+											<!--{% if data.page=='tickets' or data.page == 'assignedtickets' or data.page == 'submittedtickets' %}
+											<td>{{t.datediff}}</td>
+											{% endif %} -->
                                             <td>{{ t.id }}</td>
                                             <td>{{ t.title }}</td>
                                             <td>{{ t.desc }}</td>
@@ -46,16 +58,16 @@
                                             <td>{{ t.p_id }}</td>
                                             <td>{{ t.priority }}</td>
 											{% if t.status =='Open' %}
-												<td ><div class="open_btn  ml-2 mr-2 mt-1 mb-1">{{ t.status }}</div></td>
+												<td ><div class="open_btn  ml-2 mr-2 mt-1 mb-1"><b>{{ t.status }}</b></div></td>
 											{% elif t.status == 'In progress' %}
-												<td ><div class="progress_btn  ml-2 mr-2 mt-1 mb-1">{{ t.status }}</div></td>
+												<td ><div class="progress_btn  ml-2 mr-2 mt-1 mb-1"><b>{{ t.status }}</b></div></td>
 											{% elif t.status == 'Closed' %}
-												<td ><div class="closed_btn  ml-2 mr-2 mt-1 mb-1">{{ t.status }}</div></td>
+												<td ><div class="closed_btn  ml-2 mr-2 mt-1 mb-1"><b>{{ t.status }}</b></div></td>
 											{% endif %}
 											<td>{{ t.type }}</td>
                                             <td>{{ t.create_date }}</td>
                                             <td>{{ t.close_date }}</td>
-											{% if data.page != 'ticket_detail' %}<td><a href="/ticketdetails/{{t.id}}" >Details</a></td>{% endif %}
+											{% if data.page != 'ticket_detail' %}<td><b><a href="/ticketdetails/{{t.id}}" >Details</a></b></td>{% endif %}
                                         </tr>
                                     {% endfor %}    
                                         

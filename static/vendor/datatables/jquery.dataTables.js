@@ -1196,6 +1196,7 @@
 				// If aaSorting is not defined, then we use the first indicator in asSorting
 				// in case that has been altered, so the default sort reflects that option
 				if ( oInit.aaSorting === undefined ) {
+					alert("THis is sorted");
 					var sorting = oSettings.aaSorting;
 					for ( i=0, iLen=sorting.length ; i<iLen ; i++ ) {
 						sorting[i][1] = oSettings.aoColumns[ i ].asSorting[0];

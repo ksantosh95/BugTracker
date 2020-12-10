@@ -131,7 +131,6 @@ def get_ticket_details(ticket_id):
                 .join(Users, Map_user_proj.user_id == Users.user_id)\
                 .add_columns(Users.user_name, Users.user_id)\
                 .filter(Ticket.t_id == ticket_id).filter(Map_user_proj.user_role == 'Developer').all()
-    print(dev_list)
     data = {
         "ticket" : ticket,
         "ticket_history" : ticket_history,
@@ -148,7 +147,7 @@ def get_ticket_details(ticket_id):
 def redirect_tickets():
     userinfo = session.get('profile')
     if userinfo['role']== 'Developer':
-          return redirect(url_for('dev_get_tickets'))
+          return redirect('/dev/assignedtickets')
     elif userinfo['role'] == 'User':
         return redirect(url_for('user_get_tickets'))
     return ""
