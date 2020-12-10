@@ -7,6 +7,7 @@
 	
 	<title>Tickets</title>
 
+
 </head>
 
 <body id="page-top">
@@ -26,23 +27,45 @@
 
                 <!-- Begin Page Content -->
 					<div class="container-fluid">
-						{% if data.page == 'tickets' %}
+						{% if data.page != 'projects' %}
 						<!-- Page Heading -->
 						<div class="row">
-						<a href="/createticket" class="btn btn-info btn-icon-split ml-3 mr-2" >
+						<a href="/createticket" class="buttonbar btn-info btn-icon-split ml-3 " >
 							<span class="text">Create Ticket</span>
 						</a>
-						{% if data.role!= 'User' %}
-						<a href="mytickets" class="btn btn-info btn-icon-split ml-3 mr-2">
-							<span class="text">My Tickets</span>
+						{% if data.role != 'User' %}
+							{% if data.page == 'assignedtickets' %}
+								<a href="assignedtickets" class="buttonbar selected-btn-info btn-icon-split">
+							{% else %}
+								<a href="assignedtickets" class="buttonbar btn-info btn-icon-split">	
+							{% endif %}
+									<span class="text">Tickets assigned to me {{ data.role }}</span>
+								</a>
+							
+							{% if data.page == 'tickets' %}
+								<a href="tickets" class="buttonbar selected-btn-info btn-icon-split">
+							{% else %}
+								<a href="tickets" class="buttonbar btn-info btn-icon-split">
+							{% endif %}
+								<span class="text">All Tickets</span>
+								</a>
+							
+							{% if data.page == 'submittedtickets' %}
+								<a href="submittedtickets" class="buttonbar selected-btn-info btn-icon-split">
+							{% else %}	
+								<a href="submittedtickets" class="buttonbar btn-info btn-icon-split">
+							{% endif %}
+								<span class="text">My submitted tickets</span>
+								</a>
 						{% endif %}
-						</a>
+						
+						
 					</div>
-					<hr>
+					
 					{%- include('/includes/ticket_table.html') %}
 					
 					{% elif data.page == 'projects' %}
-					
+					<hr>
 					{%- include('/includes/project_list.html') %}
 					
 					{% endif %}

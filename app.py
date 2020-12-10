@@ -7,9 +7,9 @@ from authlib.integrations.flask_client import OAuth
 from six.moves.urllib.parse import urlencode
 
 app = Flask(__name__, template_folder='template')
-#app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://postgres:postgres@localhost:5432/bugtrackerdb"
+app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://postgres:postgres@localhost:5432/bugtrackerdb"
 # FOR HEROKU DATABASE
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
+#app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 app.secret_key = "asdfsdfsd"
@@ -68,7 +68,7 @@ from models.UsersModel import Users
 from models.ProjectModel import Project
 from models.UserProjMapModel import Map_user_proj
 from models.CommentModel import Comment
-
+from models.NotificationModel import Notification
 
 
 from controllers import UserController
@@ -84,6 +84,7 @@ def callback_handling():
     userinfo = resp.json()
     try :
         role = Users.query.with_entities(Users.user_role).filter_by(user_email = userinfo['name']).one()
+        print(role)
     except:
         print(sys.exc_info())
         abort(500)
@@ -91,10 +92,10 @@ def callback_handling():
     session['profile'] = {
        'name': userinfo['name'],
        'nickname' : userinfo['nickname'],
-       'role' : role,
+       'role' : role[0],
        'email': userinfo['email']
     }
-    return redirect('/dev/tickets')
+    return redirect('/tickets')
 
 
 

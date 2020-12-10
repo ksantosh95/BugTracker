@@ -9,6 +9,8 @@ from models.ProjectModel import Project
 from models.Ticket_HistoryModel import Ticket_history
 from models.CommentModel import Comment
 from models.UsersModel import Users
+from models.UserProjMapModel import Map_user_proj
+from models.NotificationModel import Notification
 
 
 @app.route("/createticket")
@@ -48,6 +50,7 @@ def submit_ticket():
         print(sys.exc_info())
         abort(500)
     
+    #ENTER IN TICKET HISTORY
     ticket_id = ticket_entry.t_id
     ticket_history_entry = Ticket_history(ticket_id,user_id,t_status,t_create_date,t_priority)
     try:
@@ -56,10 +59,19 @@ def submit_ticket():
         print(sys.exc_info())
         abort(500)
 
-    
-    if profile['role'][0] == 'Developer':
+    #ENTER IN NOTIFICATIONS
+    user_list = Map_user_proj.query.with_entities(Map_user_proj.user_id).filter(Map_user_proj.p_id == p_id).all()
+    print(user_list)
+    for user in user_list:
+        notification = Notification(ticket_id, user, 'New')
+        try:
+            notification.insert()
+        except:
+            print(sys.exc_info())
+            abort(500)
+    if profile['role'] == 'Developer':
         return redirect(url_for('dev_get_tickets'))
-    elif profile['role'][0] == 'User':
+    elif profile['role'] == 'User':
         return redirect(url_for('user_get_tickets'))
     return ""
 
@@ -114,6 +126,12 @@ def get_ticket_details(ticket_id):
                 .filter(Comment.t_id==ticket_id).all()
     comment = [Comment.json_format(row) for row in comment_list]
 
+    #Get list of developers in the project for assigning
+    dev_list = Ticket.query.join(Map_user_proj, Ticket.p_id == Map_user_proj.p_id)\
+                .join(Users, Map_user_proj.user_id == Users.user_id)\
+                .add_columns(Users.user_name, Users.user_id)\
+                .filter(Ticket.t_id == ticket_id).filter(Map_user_proj.user_role == 'Developer').all()
+    print(dev_list)
     data = {
         "ticket" : ticket,
         "ticket_history" : ticket_history,
@@ -121,15 +139,24 @@ def get_ticket_details(ticket_id):
         "role" : userinfo['role'],
         "username" : userinfo['nickname'],
         "page" : "ticket_detail",
-        "comment" : comment
+        "comment" : comment,
+        "dev_list" : dev_list
     }
     return render_template('ticket_details.html', data = data )
 
 @app.route("/tickets")
 def redirect_tickets():
     userinfo = session.get('profile')
-    if userinfo['role'][0] == 'Developer':
+    if userinfo['role']== 'Developer':
           return redirect(url_for('dev_get_tickets'))
-    elif userinfo['role'][0] == 'User':
+    elif userinfo['role'] == 'User':
         return redirect(url_for('user_get_tickets'))
     return ""
+
+@app.route("/assigndev", methods=['POST'])
+def assign_dev():
+    ticket_id= request.form.get('ticket_id')
+    ticket = Ticket.query.get(ticket_id)
+    ticket.assigned_user_id = request.form.get('dev_name')
+    ticket.update()
+    return redirect('/ticketdetails/'+ ticket_id) 

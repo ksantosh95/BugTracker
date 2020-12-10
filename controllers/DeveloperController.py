@@ -67,3 +67,41 @@ def dev_get_projects():
         "project" : project
     }
     return render_template('mainpage.html', data = data)
+
+
+@app.route('/dev/assignedtickets', methods=['GET'])
+def get_dev_assigned_tickets():
+    userinfo = session.get('profile')
+    dev_email= userinfo['email']
+    ticket_list = Ticket.query.join(Users, Ticket.assigned_user_id == Users.user_id)\
+                    .add_columns(Ticket.t_id, Ticket.t_title, Ticket.t_desc, Ticket.assigned_user_id, Ticket.submitter_email,\
+                        Ticket.p_id, Ticket.t_priority, Ticket.t_status, Ticket.t_type, Ticket.t_create_date, Ticket.t_close_date)\
+                            .filter(Users.user_email == dev_email)\
+                                .filter(Users.user_role== 'Developer').all()
+    ticket = [Ticket.json_format(tick) for tick in ticket_list]  
+    
+    data = {
+        "ticket" : ticket,
+        "userinfo" : userinfo,
+        "role" : userinfo['role'],
+        "username" : userinfo['nickname'],
+        "page" : "assignedtickets"
+    }
+    return render_template('mainpage.html', data = data)
+
+
+@app.route('/dev/submittedtickets', methods=['GET'])
+def get_dev_submitted_tickets():
+    userinfo = session.get('profile')
+    dev_email= userinfo['email']
+    ticket_list = Ticket.query.filter_by(submitter_email= userinfo['email']).all()
+    ticket = [Ticket.json_format(t) for t in ticket_list]  
+    
+    data = {
+        "ticket" : ticket,
+        "userinfo" : userinfo,
+        "role" : userinfo['role'],
+        "username" : userinfo['nickname'],
+        "page" : "submittedtickets"
+    }
+    return render_template('mainpage.html', data = data)

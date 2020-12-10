@@ -32,28 +32,54 @@
 					{%- include('/includes/ticket_table.html') %}
 					
 					<hr>
-					
-					<div class="testbox">
-						  <form action="/submitcomment" method="POST">
+					<div class= "row">
+						<div class="rowitem ml-4">
+							<form action="/assigndev" method="POST">
 
-							<br/>
-							<fieldset>
-							  <h5>Add Comment</h5>
-							   <div class="colums">
-							  <div class="item">
-								<input id="comment" type="text" name="comment" size="50"/>
-								{% for t in data.ticket_history %}
-								<input id="ticket_id" type="hidden" name="ticket_id" value="{{t.id}}" />
-								{% endfor%}
-								<button type="submit" href="/">Submit</button>
-							  </div>
+								<br/>
+								<fieldset>
+								<h5> Assign Developer </h5>
+								<div class="item">
+									
+									<select name="dev_name" id="dev_name" style="width:30rem; height:2rem" >
+									{% for dev in data.dev_list %}
+									  <option value={{dev.user_id}}> {{dev.user_name}}</option>
+									{% endfor %}
+									
+									</select>
+									{% for t in data.ticket_history %}
+										<input id="ticket_id" type="hidden" name="ticket_id" value="{{t.id}}" />
+									{% endfor%}
+									<button type="submit" href="/">Assign</button>
+								</div>
+								</fieldset>
+							 </form>
+						</div>
+						
+						<div class="rowitem ml-3">
+							<div class="testbox">
+								  <form action="/submitcomment" method="POST">
 
-							  </div>
-									</fieldset>
-							
-						  </form>
-    </div>
-					
+									<br/>
+									<fieldset>
+									  <h5>Add Comment</h5>
+									   <div class="colums">
+									  <div class="item">
+										<input id="comment" type="text" name="comment" size="50"/>
+										{% for t in data.ticket_history %}
+										<input id="ticket_id" type="hidden" name="ticket_id" value="{{t.id}}" />
+										{% endfor%}
+										<button type="submit" href="/">Submit</button>
+									  </div>
+
+									  </div>
+											</fieldset>
+									
+								  </form>
+							</div>
+						</div>
+						
+					</div>
 					<hr>
 					
 					

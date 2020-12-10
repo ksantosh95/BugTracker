@@ -2,6 +2,7 @@ USERS
 ------
 insert into users values (1,'Alice','alice@gmail.com','bugTracker','Developer','03/12/2020');
 insert into users values (2,'Bob','bob@gmail.com','bugTracker','Developer','03/12/2020');
+insert into users values (2,'Tom','tom@gmail.com','bugTracker','User','03/12/2020');
 
 PROJECT
 -------
@@ -13,13 +14,14 @@ MAP_USER_PROJ
 -------
 insert into map_user_proj  values (1,1,1,'Developer','03/12/2020','');
 insert into map_user_proj  values (2,1,2,'Developer','03/12/2020','');
+insert into map_user_proj  values (3,2,1,'Developer','03/12/2020','');
 
 
 
 TICKET
 --------
 insert into ticket values (1,'Test','tesing the functionality',1,'alice@gmail.com',1,'Low','Open','Test','04/12/2020','');
-insert into ticket values (5,'closed button Test','tesing the functionality',1,'bob@gmail.com',1,'Low','Closed','Test','04/12/2020','');
+insert into ticket values (2,'closed button Test','tesing the functionality',1,'bob@gmail.com',1,'Low','Closed','Test','04/12/2020','');
 
 TICKET_HISTORY
 --------
