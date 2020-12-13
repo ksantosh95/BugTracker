@@ -10,6 +10,7 @@ from models.ProjectModel import Project
 from models.UserProjMapModel import Map_user_proj
 from models.UsersModel import Users
 
+from controllers import NotificationController
 
 @app.route('/dev/tickets', methods=['GET'])
 def dev_get_tickets():
@@ -48,14 +49,20 @@ def dev_get_tickets():
         d2 = datetime.strptime(t['create_date'], '%d/%m/%Y')
         t['datediff'] = abs((d2 - d1).days)
 
+    #Get notifications
+    notification_list = NotificationController.get_notifications(userinfo['user_id'])
+
     data = {
         "ticket" : ticket_value,
         "userinfo" : userinfo,
         "role" : userinfo['role'],
         "username" : userinfo['nickname'],
-        "page" : "tickets"
+        "page" : "tickets",
+        "notification" : notification_list
     }
     
+
+
     return render_template('mainpage.html', data = data)
 
 
@@ -68,12 +75,16 @@ def dev_get_projects():
 				.add_columns(Project.p_id,Project.p_name,Project.p_desc,Project.p_start_date,Project.p_end_date)\
 				.filter(Users.user_email == dev_email).all()
     project = [Project.json_format(proj) for proj in project_list]   
+
+    #Get notifications
+    notification_list = NotificationController.get_notifications(userinfo['user_id'])
     data = {
         "userinfo" : userinfo,
         "role" : userinfo['role'],
         "username" : userinfo['nickname'],
         "page" : "projects",
-        "project" : project
+        "project" : project,
+        "notification" : notification_list
     }
     return render_template('mainpage.html', data = data)
 
@@ -96,12 +107,15 @@ def get_dev_assigned_tickets():
         d2 = datetime.strptime(t['create_date'], '%d/%m/%Y')
         t['datediff'] = abs((d2 - d1).days)
 
+
+    notification_list = NotificationController.get_notifications(userinfo['user_id'])
     data = {
         "ticket" : ticket,
         "userinfo" : userinfo,
         "role" : userinfo['role'],
         "username" : userinfo['nickname'],
-        "page" : "assignedtickets"
+        "page" : "assignedtickets",
+        "notification" : notification_list
     }
     return render_template('mainpage.html', data = data)
 
@@ -119,12 +133,15 @@ def get_dev_submitted_tickets():
     for t in ticket:
         d2 = datetime.strptime(t['create_date'], '%d/%m/%Y')
         t['datediff'] = abs((d2 - d1).days)
+    #Get notifications
+    notification_list = NotificationController.get_notifications(userinfo['user_id'])
 
     data = {
         "ticket" : ticket,
         "userinfo" : userinfo,
         "role" : userinfo['role'],
         "username" : userinfo['nickname'],
-        "page" : "submittedtickets"
+        "page" : "submittedtickets",
+        "notification" : notification_list
     }
     return render_template('mainpage.html', data = data)

@@ -12,6 +12,7 @@ from models.UsersModel import Users
 from models.UserProjMapModel import Map_user_proj
 from models.NotificationModel import Notification
 
+from controllers import NotificationController
 
 @app.route("/createticket")
 def create_ticket():
@@ -79,22 +80,10 @@ def submit_ticket():
 
 @app.route("/ticketdetails/<int:ticket_id>")
 def get_ticket_details(ticket_id):
-    sql = text("""SELECT tick_history.t_id, 
-                        filter.user_name as user_id, 
-                        tick_history.t_status, 
-                        tick_history.t_update_date, 
-                        tick_history.t_priority 
-                    FROM   ticket_history tick_history 
-                        INNER JOIN (SELECT u.user_name, 
-                                            tick.t_id 
-                                    FROM   users u 
-                                            RIGHT OUTER JOIN (SELECT assigned_user_id, 
-                                                                t_id 
-                                                        FROM   ticket 
-                                                        WHERE  t_id = """ + str(ticket_id)+""") tick 
-                                                    ON u.user_id = tick.assigned_user_id) filter 
-                                ON tick_history.t_id = filter.t_id   """)
-    result = db.session.execute(sql)
+    result = Ticket_history.query.join(Users, Ticket_history.user_id == Users.user_id, isouter=True)\
+            .add_columns(Ticket_history.t_id, Users.user_name.label('user_id'), Ticket_history.t_status, Ticket_history.t_update_date\
+                ,Ticket_history.t_priority)\
+                    .filter(Ticket_history.t_id == ticket_id)
     ticket_history_list = [row for row in result]
     ticket_history = [Ticket_history.json_format(row) for row in ticket_history_list]
 
@@ -131,6 +120,8 @@ def get_ticket_details(ticket_id):
                 .join(Users, Map_user_proj.user_id == Users.user_id)\
                 .add_columns(Users.user_name, Users.user_id)\
                 .filter(Ticket.t_id == ticket_id).filter(Map_user_proj.user_role == 'Developer').all()
+
+    notification_list = NotificationController.get_notifications(userinfo['user_id'])
     data = {
         "ticket" : ticket,
         "ticket_history" : ticket_history,
@@ -139,7 +130,8 @@ def get_ticket_details(ticket_id):
         "username" : userinfo['nickname'],
         "page" : "ticket_detail",
         "comment" : comment,
-        "dev_list" : dev_list
+        "dev_list" : dev_list,
+        "notification" : notification_list
     }
     return render_template('ticket_details.html', data = data )
 
@@ -153,9 +145,39 @@ def redirect_tickets():
     return ""
 
 @app.route("/assigndev", methods=['POST'])
+#Function to be called when a developer is assinged to a ticket
 def assign_dev():
     ticket_id= request.form.get('ticket_id')
     ticket = Ticket.query.get(ticket_id)
     ticket.assigned_user_id = request.form.get('dev_name')
     ticket.update()
+
+    #Insert record in ticket history
+    user_id = request.form.get('dev_name')
+    today = date.today()
+    t_update_date = today.strftime("%d/%m/%Y")
+    ticket_history = Ticket_history(ticket_id, user_id, ticket.t_status, t_update_date, ticket.t_priority )
+    try:
+        ticket_history.insert()
+    except:
+        print(sys.exc_info())
+        abort(500)
+
+    #Insert record in comments
+    userinfo = session.get('profile')
+    assigned_user_name = Users.query.with_entities(Users.user_name).filter(Users.user_id == user_id).one()
+    comment = Comment(ticket_id, userinfo['user_id'],t_update_date, " assigned developer " + assigned_user_name[0] )
+    try:
+        comment.insert()
+    except:
+        print(sys.exc_info())
+        abort(500)
+
+    #Record a notification
+    notification = Notification(ticket_id, user_id, 'Assigned')
+    try:
+        notification.insert()
+    except:
+        print(sys.exc_info())
+        abort(500)
     return redirect('/ticketdetails/'+ ticket_id) 

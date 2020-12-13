@@ -76,6 +76,7 @@ from controllers import DeveloperController
 from controllers import TicketController
 from controllers import CommentController
 from controllers import ProjectController
+from controllers import NotificationController
 
 @app.route('/callback')
 def callback_handling():
@@ -84,7 +85,7 @@ def callback_handling():
     userinfo = resp.json()
     try :
         role = Users.query.with_entities(Users.user_role).filter_by(user_email = userinfo['name']).one()
-        print(role)
+        user_id = Users.query.with_entities(Users.user_id).filter_by(user_email = userinfo['name']).one()
     except:
         print(sys.exc_info())
         abort(500)
@@ -93,7 +94,8 @@ def callback_handling():
        'name': userinfo['name'],
        'nickname' : userinfo['nickname'],
        'role' : role[0],
-       'email': userinfo['email']
+       'email': userinfo['email'],
+       'user_id' : user_id[0]
     }
     return redirect('/tickets')
 
