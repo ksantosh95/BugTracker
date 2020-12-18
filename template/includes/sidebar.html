@@ -8,7 +8,21 @@
                 </div>
                 <div class="sidebar-brand-text mx-3">Welcome </div>
             </a>
-
+			
+			
+			{% if data.role == 'Admin' %}
+			
+			<!-- Divider -->
+            <hr class="sidebar-divider my-2	">
+			
+            <li class="nav-item ml-5">
+                <a class="nav-link" href="../admin/user-list">
+					<i class="fas fa-users"></i>
+                  <span	>Users</span></a>
+            </li>
+			{% endif %}
+			
+			
             <!-- Divider -->
             <hr class="sidebar-divider my-2	">
 
@@ -24,10 +38,10 @@
 			{% if data.role != 'User' %}
 			
 			<!-- Divider -->
-            <hr class="sidebar-divider">
+            <hr class="sidebar-divider my-2">
 			
 			
-            <li class="nav-item ml-5">
+            <li class="nav-item ml-5 mb-2">
                 <a class="nav-link" href="../projects">
 					<i class="fa fa-tasks"></i>
                   <span	>Projects</span></a>

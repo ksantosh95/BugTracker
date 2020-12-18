@@ -2,7 +2,8 @@ USERS
 ------
 insert into users values (1,'Alice','alice@gmail.com','bugTracker','Developer','03/12/2020');
 insert into users values (2,'Bob','bob@gmail.com','bugTracker','Developer','03/12/2020');
-insert into users values (2,'Tom','tom@gmail.com','bugTracker','User','03/12/2020');
+insert into users values (3,'Tom','tom@gmail.com','bugTracker','User','03/12/2020');
+insert into users values (4,'Admin','admin@gmail.com','bugTracker','Admin','03/12/2020');
 
 PROJECT
 -------

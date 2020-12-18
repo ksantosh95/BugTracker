@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>New User</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700" rel="stylesheet">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+
+      <link href="/static/css/form.css" rel="stylesheet" type="text/css">
+
+  </head>
+  <body>
+  
+  
+  
+  
+    <div class="testbox">
+      <form action="/user-submit" method="POST">
+
+        <br/>
+        <fieldset>
+          <legend>User Information</legend>
+           <div class="colums">
+			  <div class="item">
+				<label for="user_name"> Name<span>*</span></label>
+				<input id="user_name" type="text" name="user_name" />
+			  </div>
+			  <div class="item">
+				<label for="user_email"> Email<span>*</span></label>
+				<input id="user_email" type="text" name="user_email" />
+			  </div>
+
+				<div class="item">
+				<label for="user_role">Role<span>*</span></label>
+				<select name="user_role" id="user_role" style="width:38rem; height:2rem">
+				  <option value="User">User</option>
+				  <option value="Developer">Developer</option>
+				  <option value="Project Manager">Project Manager</option>
+				</select>
+				</div>
+
+
+            
+         
+          </div>
+                </fieldset>
+        <div class="btn-block">
+          <button type="submit" href="/">Submit</button>
+        </div>
+      </form>
+    </div>
+
+  </body>
+</html>

@@ -142,6 +142,8 @@ def redirect_tickets():
           return redirect('/dev/assignedtickets')
     elif userinfo['role'] == 'User':
         return redirect(url_for('user_get_tickets'))
+    if userinfo['role']== 'Admin': 
+        return redirect("/admin/user-list")
     return ""
 
 @app.route("/assigndev", methods=['POST'])
