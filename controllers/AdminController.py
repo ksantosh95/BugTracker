@@ -28,7 +28,7 @@ def admin_get_users():
 
 #CREATE A NEW USER
 
-@app.route("/create-user")
+@app.route("/admin/create-user")
 def create_user():
     userinfo = session.get('profile')  
     project_name_list = Project.query.all()
@@ -44,7 +44,7 @@ def create_user():
 
 
 
-@app.route("/edit-user/<int:user_id>")
+@app.route("/admin/edit-user/<int:user_id>")
 def get_user_info(user_id):
     userinfo = session.get('profile')  
     user_entry = Users.query.get(user_id)
@@ -69,7 +69,7 @@ def get_user_info(user_id):
 
 
 
-@app.route("/user-submit", methods=['POST'])
+@app.route("/admin/user-submit", methods=['POST'])
 def submit_user():
     user_name = request.form.get('user_name')
     user_email = request.form.get('user_email')
@@ -97,7 +97,7 @@ def submit_user():
 
 
 #UPDATE INFORMATION FOR THE USER
-@app.route("/user-update", methods=['POST'])
+@app.route("/admin/user-update", methods=['POST'])
 def update_user():
     user_id = request.form.get('user_id')
     user = Users.query.get(user_id)
@@ -112,7 +112,7 @@ def update_user():
     return redirect("/admin/user-list")
 
 #DELETE USER
-@app.route("/delete-user/<int:user_id>")
+@app.route("/admin/delete-user/<int:user_id>")
 def delete_user(user_id):
     user = Users.query.get(user_id)
     try:
@@ -122,7 +122,7 @@ def delete_user(user_id):
         abort(500)
     return redirect("/admin/user-list")
 
-@app.route("/userdetails/<int:user_id>")
+@app.route("/admin/userdetails/<int:user_id>")
 def get_user_history(user_id):
     userinfo = session.get('profile')
     userentry = Users.query.get(user_id)
@@ -158,13 +158,14 @@ def get_user_history(user_id):
     return render_template('user_details.html', data = data)
 
 
-#ASSIGN USER TO A NEW PROJECT
-@app.route("/assign-user-project", methods=['POST'])
+#ASSIGN PROJECT TO THE USER
+@app.route("/admin/assign-user-project", methods=['POST'])
 def assign_user_to_project():
     userinfo = session.get('profile')
     user_id = request.form.get('user_id')
     project_id = request.form.get('project')
     role = request.form.get('role')
+    page = request.form.get('page')
     today = date.today()
     update_date = today.strftime("%d/%m/%Y")
     map_entry = Map_user_proj (user_id, project_id, role,update_date, "" )
@@ -173,15 +174,42 @@ def assign_user_to_project():
     except:
         print(sys.exc_info())
         abort(500)
-    return redirect("/userdetails/" + user_id)
+    if page == 'project-details':
+        return redirect("/projectdetails/" + project_id)
+    else:
+        return redirect("/admin/userdetails/" + user_id)
 
-##DELETE USER
-@app.route("/delete-project-user/")
+##DELETE USER FROM USER DETAILS PAGE
+@app.route("/admin/delete-project-user/")
 def delete_project_user():
     user_id = request.args.get('user_id')
     project_id = request.args.get('project_id')
     map= Map_user_proj.query.filter(Map_user_proj.user_id == user_id).filter(Map_user_proj.p_id == project_id).one()
-    
     map.delete()
+    return redirect("/admin/userdetails/" + user_id)
 
-    return redirect("/userdetails/" + user_id)
+##DELETE USER FROM PROJECT DETAILS PAGE
+@app.route("/admin/delete-project-user-project-details/")
+def delete_project_user_projectdetails():
+    user_id = request.args.get('user_id')
+    project_id = request.args.get('project_id')
+    map= Map_user_proj.query.filter(Map_user_proj.user_id == user_id).filter(Map_user_proj.p_id == project_id).one()
+    map.delete()
+    return redirect("/projectdetails/" + project_id)
+
+#ADMIN PROJECT LIST
+@app.route('/admin/projects', methods=['GET'])
+def admin_get_projects():
+    userinfo = session.get('profile')
+    project_list = Project.query.all()
+    project = [Project.json_format(proj) for proj in project_list]  
+    data = {
+        "project" : project,
+        "role" : userinfo['role'],
+        "username" : userinfo['nickname'],
+        "page" : "projects",
+        "userinfo" : userinfo
+    }
+    return render_template('admin-mainpage.html', data = data)
+
+

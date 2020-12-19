@@ -3031,6 +3031,11 @@ fieldset:disabled a.btn {
   width: 100%;
 }
 
+.btn-small {
+  display: block;
+  width: 10%;
+}
+
 .btn-block + .btn-block {
   margin-top: 0.5rem;
 }
@@ -11394,7 +11399,7 @@ body.sidebar-toggled footer.sticky-footer {
 }
 
 /* The Modal (background) */
-.modal {
+.modal1 {
   display: none; /* Hidden by default */
   position: fixed; /* Stay in place */
   z-index: 1; /* Sit on top */
@@ -11409,7 +11414,7 @@ body.sidebar-toggled footer.sticky-footer {
 }
 
 /* Modal Content */
-.modal-content {
+.modal-content-1 {
   background-color: #fefefe;
   margin: auto;
   padding: 20px;

@@ -8,7 +8,7 @@
 	
 	<title>
 		{% if data.page == 'admin-user' %}
-		Admin | User List
+		Admin | Users
 		{% endif %}
 	</title>
 
@@ -32,13 +32,13 @@
                 <!-- Begin Page Content -->
 					<div class="container-fluid">
 						<!-- Page Heading -->
-						
+							{% if data.page=='user-list'%}
 								<div class="row mb-2  mt-2">
-										<a href="/create-user" class="buttonbar selected-btn-info btn-icon-split ml-3" >
+										<a href="/admin/create-user" class="buttonbar selected-btn-info btn-icon-split ml-3" >
 											<span class="text"><b>Create User</b></span>
 										</a>
 								</div>
-								
+							{%  endif %}	
 					{% if data.page == 'user-list' %}
 					
 					{%- include('/includes/user_table.html') %} 

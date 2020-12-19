@@ -98,9 +98,18 @@ def callback_handling():
        'email': userinfo['email'],
        'user_id' : user_id[0]
     }
-    return redirect('/tickets')
+    return redirect('/landing')
 
-
+@app.route('/landing')
+def redirect_users():
+    userinfo = session.get('profile')
+    if userinfo['role']== 'Developer':
+          return redirect('/tickets')
+    elif userinfo['role'] == 'User':
+        return redirect('/tickets')
+    elif userinfo['role']== 'Admin': 
+        return redirect("/admin/user-list")
+    return ""
 
 
 

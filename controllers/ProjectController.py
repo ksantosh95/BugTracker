@@ -23,6 +23,8 @@ def redirect_projects():
     userinfo = session.get('profile')
     if userinfo['role'] == 'Developer':
         return redirect('/dev/projects')
+    elif userinfo['role'] == 'Admin':
+        return redirect('/admin/projects')
     return ""
 
 @app.route("/projectdetails/<int:project_id>")
@@ -44,6 +46,9 @@ def get_project_details(project_id):
                         .filter(Ticket.p_id == project_id).all()
     project_tickets =  [Ticket.json_format(row) for row in project_tickets_list]
 
+    user_list = Users.query.filter(Users.user_role != "Admin").all()
+    user_list_json = [Users.json_format(u) for u in user_list]  
+
     data = {
         "project" :project,
         "project_users" : project_users,
@@ -51,6 +56,7 @@ def get_project_details(project_id):
         "userinfo" : userinfo,
         "role" : userinfo['role'],
         "username" : userinfo['nickname'],
-        "page" : "project_detail"
+        "page" : "project_detail",
+        "userlist" : user_list_json
     }
     return render_template('project_details.html', data = data )

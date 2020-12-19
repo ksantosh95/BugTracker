@@ -4,7 +4,7 @@
                         <div class="card-header py-3">
                             <h6 class="m-0 font-weight-bold text-primary">
 
-							User List
+							Users
 	
 							</h6>
                         </div>
@@ -41,14 +41,14 @@
 											<td>{{ u.last_update_date }}</td>
 											<td><b>
 													{% if data.page == 'user-details' %}
-													<a href="/edit-user/{{u.id}}" >
+													<a href="/admin/edit-user/{{u.id}}" >
 													Edit
 													</a>&nbsp &nbsp
-													<a href="/delete-user/{{u.id}}" >
+													<a href="/admin/delete-user/{{u.id}}" >
 													Delete
 													</a>
 													{% elif data.page == 'user-list'%}
-													<a href="/userdetails/{{u.id}}" >
+													<a href="/admin/userdetails/{{u.id}}" >
 													Manage
 													</a>
 													{% endif %}

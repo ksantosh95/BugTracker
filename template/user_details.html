@@ -39,11 +39,11 @@
 						<button id="myBtn" class="ml-3">Assign New Project</button>
 						
 						<!-- The Modal -->
-						<div id="myModal" class="modal">
+						<div id="myModal" class="modal1">
 
 						  <!-- Modal content -->
-						  <div class="modal-content">
-							<form action="/assign-user-project" method="POST" class="form-container">
+						  <div class="modal-content-1">
+							<form action="../assign-user-project" method="POST" class="form-container">
 
 								<br/>
 								<fieldset>
@@ -103,7 +103,7 @@
 												<td>{{ proj.p_id }}</td>
 												<td>{{ proj.p_name }}</td>
 												<td>{% for u in data.user %}
-													<a href="/delete-project-user/?user_id={{u.id}}&project_id={{proj.p_id}}" >Remove</a></td>
+													<a href="/admin/delete-project-user/?user_id={{u.id}}&project_id={{proj.p_id}}" >Remove</a></td>
 													{% endfor %}
 											</tr>
 										{% endfor %}    
