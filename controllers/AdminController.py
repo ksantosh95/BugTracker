@@ -127,9 +127,12 @@ def get_user_history(user_id):
     userinfo = session.get('profile')
     userentry = Users.query.get(user_id)
     user = Users.json_format(userentry)
-    project_list = Project.query.join(Map_user_proj, Project.p_id == Map_user_proj.p_id)\
+    user_project_list = Project.query.join(Map_user_proj, Project.p_id == Map_user_proj.p_id)\
                     .add_columns(Project.p_id, Project.p_name)\
                         .filter(Map_user_proj.user_id == user_id)
+
+    project_name_list = Project.query.all()
+    project_name_list_json = [Project.json_format(row) for row in project_name_list]
 
     user_role = user['role']
     user_email = user['email']
@@ -143,8 +146,9 @@ def get_user_history(user_id):
                             .filter(Ticket.submitter_email == user_email)
 
     data = {
+        "project" : project_name_list_json,
         "userinfo" : userinfo,
-        "project" : project_list,
+        "user_project" : user_project_list,
         "role" : userinfo['role'],
         "username" : userinfo['nickname'],
         "user" : [user],
@@ -152,3 +156,32 @@ def get_user_history(user_id):
         "ticket": ticket_list
     }
     return render_template('user_details.html', data = data)
+
+
+#ASSIGN USER TO A NEW PROJECT
+@app.route("/assign-user-project", methods=['POST'])
+def assign_user_to_project():
+    userinfo = session.get('profile')
+    user_id = request.form.get('user_id')
+    project_id = request.form.get('project')
+    role = request.form.get('role')
+    today = date.today()
+    update_date = today.strftime("%d/%m/%Y")
+    map_entry = Map_user_proj (user_id, project_id, role,update_date, "" )
+    try:
+        map_entry.insert()
+    except:
+        print(sys.exc_info())
+        abort(500)
+    return redirect("/userdetails/" + user_id)
+
+##DELETE USER
+@app.route("/delete-project-user/")
+def delete_project_user():
+    user_id = request.args.get('user_id')
+    project_id = request.args.get('project_id')
+    map= Map_user_proj.query.filter(Map_user_proj.user_id == user_id).filter(Map_user_proj.p_id == project_id).one()
+    
+    map.delete()
+
+    return redirect("/userdetails/" + user_id)

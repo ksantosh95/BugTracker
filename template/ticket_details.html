@@ -31,6 +31,7 @@
 					<hr>
 					{%- include('/includes/ticket_table.html') %}
 					
+					{%  if data.userinfo['role'] != 'Admin'%}
 					<hr>
 					<div class= "row">
 						<div class="rowitem ml-4">
@@ -82,6 +83,7 @@
 						</div>
 						
 					</div>
+					{% endif %}
 					<hr>
 					
 					

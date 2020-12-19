@@ -32,9 +32,52 @@
 					{%- include('/includes/user_table.html') %}
 					
 					<hr>
-					
+					<div class= "row">
+						
+						
+						
+						<button id="myBtn" class="ml-3">Assign New Project</button>
+						
+						<!-- The Modal -->
+						<div id="myModal" class="modal">
 
-					
+						  <!-- Modal content -->
+						  <div class="modal-content">
+							<form action="/assign-user-project" method="POST" class="form-container">
+
+								<br/>
+								<fieldset>
+								<h6> Assign New Project </h6>
+								<div class="item">
+									
+									<select name="project" id="project" style="width:30rem; height:2rem" >
+									{% for proj in data.project %}
+									  <option value={{proj.id}}> {{proj.name}}</option>
+									{% endfor %}
+									
+									</select>
+									{% for u in data.user %}
+										<input id="user_id" type="hidden" name="user_id" value="{{u.id}}" />
+									{% endfor%}
+									<br><br>
+									<div class="item">
+									<label for="role">Role<span>*</span></label> <br>
+									<select name="role" id="role" style="width:30rem; height:2rem" >
+									  <option  value="User">User</option>
+									  <option value="Developer">Developer</option>
+									  <option value="Project Manager">Project Manager</option>
+									</select>
+									</div><br>
+									<button type="submit" href="/">Assign</button>
+								</div>
+								</fieldset>
+							 </form>
+						  </div>
+
+						</div>
+					</div>	
+
+					<hr>
 					
 					<div class="row">
 					
@@ -55,11 +98,13 @@
 										</thead>
 										
 										<tbody>
-										{% for proj in data.project %}
+										{% for proj in data.user_project %}
 											<tr>
 												<td>{{ proj.p_id }}</td>
 												<td>{{ proj.p_name }}</td>
-												<td>Remove</td>
+												<td>{% for u in data.user %}
+													<a href="/delete-project-user/?user_id={{u.id}}&project_id={{proj.p_id}}" >Remove</a></td>
+													{% endfor %}
 											</tr>
 										{% endfor %}    
 											
@@ -74,7 +119,13 @@
 						<!-- Ticket history -->
 						<div class="detailscard shadow mb-4 ml-3">
 							<div class="card-header py-3">
-								<h6 class="m-0 font-weight-bold text-primary">Tickets</h6>
+								{% for u in data.user %}
+									{% if u.role=='Developer' %}
+									<h6 class="m-0 font-weight-bold text-primary">Tickets Assigned</h6>
+									{% elif u.role == 'User' %}
+									<h6 class="m-0 font-weight-bold text-primary">Tickets Submitted</h6>
+									{% endif %}
+								{% endfor %}
 							</div>
 							<div class="card-body">
 								<div class="table-responsive">
@@ -92,7 +143,7 @@
 										{% for t in data.ticket %}
 											<tr>
 												<td>{{ t.t_id }}</td>
-												<td>{{ t.t_title }}</td>
+												<td><a href="../ticketdetails/{{t.t_id}}">{{ t.t_title }}</a></td>
 												<td>{{ t.p_name }}</td>
 												<td>
 													{% if t.t_status =='Open' %}
