@@ -14,6 +14,7 @@
   
   
     <div class="testbox">
+		{% if data.page == 'create-user'%}
       <form action="/user-submit" method="POST">
 
         <br/>
@@ -28,6 +29,16 @@
 				<label for="user_email"> Email<span>*</span></label>
 				<input id="user_email" type="text" name="user_email" />
 			  </div>
+				
+				<div class="item">
+				<label for="project">Project<span>*</span></label>
+				<select name="project" id="project">
+				{% for proj in data.project %}
+				  <option value={{ proj.id }}>{{ proj.name }}</option>
+				  {% endfor %}
+				  
+				</select>
+				</div>
 
 				<div class="item">
 				<label for="user_role">Role<span>*</span></label>
@@ -47,6 +58,55 @@
           <button type="submit" href="/">Submit</button>
         </div>
       </form>
+	  {% elif data.page == 'edit-user'%}
+	  
+	  <form action="/user-update" method="POST">
+
+        <br/>
+        <fieldset>
+          <legend>Edit User Information</legend>
+           <div class="colums">
+			  <div class="item">
+				<label for="user_name"> Name<span>*</span></label>
+				<input id="user_name" type="text" name="user_name" value={{ data.user.name }} />
+			  </div>
+			  <div class="item">
+				<label for="user_email"> Email<span>*</span></label>
+				<input id="user_email" type="text" name="user_email" value={{ data.user.email}} />
+			  </div>
+				<input id="user_id" type="hidden" name="user_id" value={{ data.user.id}} />
+
+				<div class="item">
+				<label for="user_role">Role<span>*</span></label>
+				<select name="user_role" id="user_role" style="width:38rem; height:2rem" >
+				{% if data.user.role == 'User' %}
+				  <option selected="selected" value="User">User</option>
+				{% else %}
+					<option selected="selected" value="User">User</option>
+				{% endif %}
+				{% if data.user.role == 'Developer' %}
+				  <option selected="selected" value="Developer">Developer</option>
+				  {% else %}
+				  <option value="Developer">Developer</option>
+				  {% endif %}
+				  {% if data.user.role == 'Project Manager' %}
+				  <option  selected="selected" value="Project Manager">Project Manager</option>
+				  {% else %}
+				  <option value="Project Manager">Project Manager</option>
+				  {% endif %}
+				</select>
+				</div>
+
+
+            
+         
+          </div>
+                </fieldset>
+        <div class="btn-block">
+          <button type="submit" href="/">Submit</button>
+        </div>
+      </form>
+		{% endif %}
     </div>
 
   </body>

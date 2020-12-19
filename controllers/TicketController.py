@@ -142,7 +142,7 @@ def redirect_tickets():
           return redirect('/dev/assignedtickets')
     elif userinfo['role'] == 'User':
         return redirect(url_for('user_get_tickets'))
-    if userinfo['role']== 'Admin': 
+    elif userinfo['role']== 'Admin': 
         return redirect("/admin/user-list")
     return ""
 

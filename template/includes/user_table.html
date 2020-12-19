@@ -1,6 +1,6 @@
 <!-- DataTales Example -->
                     <div class="card shadow mb-4">
-						{% if data.page == 'admin-user'  %}
+						{% if data.page == 'user-list'  %}
                         <div class="card-header py-3">
                             <h6 class="m-0 font-weight-bold text-primary">
 
@@ -8,11 +8,11 @@
 	
 							</h6>
                         </div>
-						{% elif data.role == 'User' %}
+						{% elif data.page == 'user-details' %}
 						<div class="card-header py-3">
                             <h6 class="m-0 font-weight-bold text-primary">
 
-							Tickets
+							User Information
 	
 							</h6>
                         </div>
@@ -22,10 +22,6 @@
                                 <table class="table table-bordered medium" id="dataTable" width="100%" cellspacing="0">
                                     <thead>
                                         <tr>
-											<!--
-											{% if data.page=='tickets' or data.page == 'assignedtickets' or data.page == 'submittedtickets' %}
-											<th>Days since creation</th>
-											{% endif %}-->
                                             <th>User Id</th>
                                             <th>Name</th>
                                             <th>Email</th>
@@ -38,15 +34,25 @@
                                     <tbody>
 									{% for u in data.user %}
                                         <tr>
-											<!--{% if data.page=='tickets' or data.page == 'assignedtickets' or data.page == 'submittedtickets' %}
-											<td>{{t.datediff}}</td>
-											{% endif %} -->
                                             <td>{{ u.id }}</td>
                                             <td>{{ u.name }}</td>
                                             <td>{{ u.email }}</td>
                                             <td>{{ u.role }}</td>
 											<td>{{ u.last_update_date }}</td>
-											<td><b><a href="#" >Manage</a></b></td>
+											<td><b>
+													{% if data.page == 'user-details' %}
+													<a href="/edit-user/{{u.id}}" >
+													Edit
+													</a>&nbsp &nbsp
+													<a href="/delete-user/{{u.id}}" >
+													Delete
+													</a>
+													{% elif data.page == 'user-list'%}
+													<a href="/userdetails/{{u.id}}" >
+													Manage
+													</a>
+													{% endif %}
+													</b></td>
                                         </tr>
                                     {% endfor %}    
                                         

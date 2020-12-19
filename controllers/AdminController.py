@@ -21,7 +21,7 @@ def admin_get_users():
         "user" : user,
         "role" : userinfo['role'],
         "username" : userinfo['nickname'],
-        "page" : "admin-user",
+        "page" : "user-list",
         "userinfo" : userinfo
     }
     return render_template('admin-mainpage.html', data = data)
@@ -31,14 +31,41 @@ def admin_get_users():
 @app.route("/create-user")
 def create_user():
     userinfo = session.get('profile')  
+    project_name_list = Project.query.all()
+    project_name_list_json = [Project.json_format(row) for row in project_name_list]
     data = {
+        "project" : project_name_list_json,
         "userinfo" : userinfo,
         "role" : userinfo['role'],
-        "username" : userinfo['nickname']
+        "username" : userinfo['nickname'],
+        "page": "create-user"
     }
     return render_template('userform.html', data = data)
 
 
+
+@app.route("/edit-user/<int:user_id>")
+def get_user_info(user_id):
+    userinfo = session.get('profile')  
+    user_entry = Users.query.get(user_id)
+    user = Users.json_format(user_entry)
+    project = Project.query.join(Map_user_proj, Project.p_id == Map_user_proj.p_id)\
+                .add_columns(Project.p_name, Project.p_id)\
+                    .filter(Map_user_proj.user_id == user_id)
+ 
+    project_name_list = Project.query.all()
+    project_name_list_json = [Project.json_format(row) for row in project_name_list]
+
+    data = {
+        "project" : project_name_list_json,
+        "userinfo" : userinfo,
+        "user_project" : project,
+        "role" : userinfo['role'],
+        "username" : userinfo['nickname'],
+        "user": user,
+        "page": "edit-user"
+    }
+    return render_template('userform.html', data = data)
 
 
 
@@ -47,6 +74,7 @@ def submit_user():
     user_name = request.form.get('user_name')
     user_email = request.form.get('user_email')
     user_role = request.form.get('user_role')
+    project_id = request.form.get('project')
     user_pwd = "bugTracker123"
     today = date.today()
     update_date = today.strftime("%d/%m/%Y")
@@ -58,4 +86,69 @@ def submit_user():
         print(sys.exc_info())
         abort(500)
 
+    map_entry = Map_user_proj(user_entry.user_id, project_id, user_role, update_date, "")
+    try:
+        map_entry.insert()
+    except:
+        print(sys.exc_info())
+        abort(500)
+
     return redirect("/admin/user-list")
+
+
+#UPDATE INFORMATION FOR THE USER
+@app.route("/user-update", methods=['POST'])
+def update_user():
+    user_id = request.form.get('user_id')
+    user = Users.query.get(user_id)
+    user.user_name = request.form.get('user_name')
+    user.user_role = request.form.get('user_role')
+    today = date.today()
+    update_date = today.strftime("%d/%m/%Y")
+    user.update_date = update_date
+    user.update()
+
+
+    return redirect("/admin/user-list")
+
+#DELETE USER
+@app.route("/delete-user/<int:user_id>")
+def delete_user(user_id):
+    user = Users.query.get(user_id)
+    try:
+        user.delete()
+    except:
+        print(sys.exc_info())
+        abort(500)
+    return redirect("/admin/user-list")
+
+@app.route("/userdetails/<int:user_id>")
+def get_user_history(user_id):
+    userinfo = session.get('profile')
+    userentry = Users.query.get(user_id)
+    user = Users.json_format(userentry)
+    project_list = Project.query.join(Map_user_proj, Project.p_id == Map_user_proj.p_id)\
+                    .add_columns(Project.p_id, Project.p_name)\
+                        .filter(Map_user_proj.user_id == user_id)
+
+    user_role = user['role']
+    user_email = user['email']
+    if user_role == "Developer":
+        ticket_list = Ticket.query.join(Project, Ticket.p_id == Project.p_id)\
+                        .add_columns(Ticket.t_id, Ticket.t_title, Ticket.t_status,Project.p_name)\
+                            .filter(Ticket.assigned_user_id == user_id)
+    elif user_role == "User":
+        ticket_list = Ticket.query.join(Project, Ticket.p_id == Project.p_id)\
+                        .add_columns(Ticket.t_id, Ticket.t_title, Ticket.t_status, Project.p_name)\
+                            .filter(Ticket.submitter_email == user_email)
+
+    data = {
+        "userinfo" : userinfo,
+        "project" : project_list,
+        "role" : userinfo['role'],
+        "username" : userinfo['nickname'],
+        "user" : [user],
+        "page": "user-details",
+        "ticket": ticket_list
+    }
+    return render_template('user_details.html', data = data)

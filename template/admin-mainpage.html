@@ -9,6 +9,7 @@
 	<title>
 		{% if data.page == 'admin-user' %}
 		Admin | User List
+		{% endif %}
 	</title>
 
 </head>
@@ -39,16 +40,18 @@
 
 								
 								</div>
+								
+					{% if data.page == 'user-list' %}
 					
-					{%- include('/includes/user_table.html') %}
+					{%- include('/includes/user_table.html') %} 
 					
 					{% elif data.page == 'projects' %}
 					<hr>
 					{%- include('/includes/project_list.html') %}
 					
 					{% endif %}
-                </div>
-                <!-- /.container-fluid -->
+					</div>
+				<!-- /.container-fluid -->
 
             </div>
             <!-- End of Main Content -->
