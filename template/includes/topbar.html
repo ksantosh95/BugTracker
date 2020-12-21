@@ -5,7 +5,7 @@
                     <!-- Topbar Navbar -->
                     <ul class="navbar-nav ml-auto">
 
-
+						{% if data.role!='Admin' %}
                         <!-- Nav Item - Alerts -->
                         <li class="nav-item dropdown no-arrow mx-1">
                             <a class="nav-link dropdown-toggle" href="#" id="alertsDropdown" role="button"
@@ -23,9 +23,9 @@
                                 <h6 class="dropdown-header">
                                     Notifications Center
                                 </h6>
-								
+								<!-- NOTIFICATIONS FOR USER ASSIGNMENT  -->
 								{% for n in data.notification %}
-								
+								{% if n.n_type == 'Assigned' %}
 								<a class="dropdown-item d-flex align-items-center" href="/deletenotification?ticket_id={{ n.t_id }}&n_id={{ n.n_id }}">
                                     <div class="mr-3">
                                         <div class="icon-circle bg-warning">
@@ -37,8 +37,28 @@
                                         You have been assigned to ticket no {{n.t_id}}
                                     </div>
                                 </a>
+								{% endif %}
 								{% endfor %}
+								
+								<!-- NOTIFICATIONS FOR TICKET UPDATES  -->
 								{% for n in data.notification %}
+								{% if n.n_type == 'Assigned' %}
+                                <a class="dropdown-item d-flex align-items-center" href="/deletenotification?ticket_id={{ n.t_id }}&n_id={{ n.n_id }}">
+                                    <div class="mr-3">
+                                        <div class="icon-circle bg-primary">
+                                            <i class="fas fa-file-alt text-white"></i>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="small text-gray-500">December 12, 2019</div>
+                                        <span class="font-weight-bold"> Information for ticket Id : {{n.t_id}} has been updated </span>
+                                    </div>
+                                </a>
+								{% endif %}
+                                {% endfor %}
+								<!-- NOTIFICATIONS FOR NEW TICKETS  -->
+								{% for n in data.notification %}
+								{% if n.n_type == 'New' %}
                                 <a class="dropdown-item d-flex align-items-center" href="/deletenotification?ticket_id={{ n.t_id }}&n_id={{ n.n_id }}">
                                     <div class="mr-3">
                                         <div class="icon-circle bg-primary">
@@ -50,6 +70,7 @@
                                         <span class="font-weight-bold"> New ticket with ticket id : {{n.t_id}} has been created </span>
                                     </div>
                                 </a>
+								{% endif %}
                                 {% endfor %}
 								
 								
@@ -59,7 +80,7 @@
 							
 							
                         </li>
-
+						{% endif %}
                         
 
                         <div class="topbar-divider d-none d-sm-block"></div>

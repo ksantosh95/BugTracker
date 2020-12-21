@@ -39,9 +39,26 @@
 										</a>
 								</div>
 							{%  endif %}	
+							{% if data.page=='tickets'%}
+								<div class="row mb-2  mt-2">
+										<a href="/createticket" class="buttonbar selected-btn-info btn-icon-split ml-3" >
+											<span class="text"><b>Create Ticket</b></span>
+										</a>
+								</div>
+							{%  endif %}
+							
+							
+							
+							
+							
+							
 					{% if data.page == 'user-list' %}
 					
 					{%- include('/includes/user_table.html') %} 
+					
+					
+					{% elif data.page == 'tickets' %}
+					{%- include('/includes/ticket_table.html') %}
 					
 					{% elif data.page == 'projects' %}
 					<hr>

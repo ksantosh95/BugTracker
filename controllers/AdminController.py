@@ -161,6 +161,7 @@ def get_user_history(user_id):
 #ASSIGN PROJECT TO THE USER
 @app.route("/admin/assign-user-project", methods=['POST'])
 def assign_user_to_project():
+    input_type= request.form.get('input')
     userinfo = session.get('profile')
     user_id = request.form.get('user_id')
     project_id = request.form.get('project')
@@ -168,12 +169,18 @@ def assign_user_to_project():
     page = request.form.get('page')
     today = date.today()
     update_date = today.strftime("%d/%m/%Y")
-    map_entry = Map_user_proj (user_id, project_id, role,update_date, "" )
-    try:
-        map_entry.insert()
-    except:
-        print(sys.exc_info())
-        abort(500)
+
+    if input_type == "Add":
+        map_entry = Map_user_proj (user_id, project_id, role,update_date, "" )
+        try:
+            map_entry.insert()
+        except:
+            print(sys.exc_info())
+            abort(500)
+    elif input_type =="Update":
+        map_entry = Map_user_proj.query.filter(Map_user_proj.user_id==user_id).filter(Map_user_proj.p_id == project_id).one()
+        map_entry.user_role = role
+        map_entry.update()
     if page == 'project-details':
         return redirect("/projectdetails/" + project_id)
     else:
@@ -213,3 +220,53 @@ def admin_get_projects():
     return render_template('admin-mainpage.html', data = data)
 
 
+#ADMIN TICKETS LIST
+@app.route('/admin/tickets', methods=['GET'])
+def admin_get_tickets():
+    userinfo = session.get('profile')
+    ticket_value = Ticket.query.all()
+    ticket_value = [t.json_format() for t in ticket_value]
+    data = {
+        "ticket" : ticket_value,
+        "role" : userinfo['role'],
+        "username" : userinfo['nickname'],
+        "page" : "tickets",
+        "userinfo" : userinfo
+    }
+    return render_template('admin-mainpage.html', data = data)
+
+
+#DELETE TICKET
+@app.route("/admin/delete-ticket/<int:ticket_id>")
+def admin_delete_ticket(ticket_id):
+    ticket = Ticket.query.get(ticket_id)
+    try:
+        ticket.delete()
+    except:
+        print(sys.exc_info())
+        abort(500)
+    return redirect("/admin/tickets")
+
+
+@app.route("/admin/edit-ticket/<int:ticket_id>")
+def get_ticket_info(ticket_id):
+    userinfo = session.get('profile')  
+    ticket_json = Ticket.query.get(ticket_id)
+    ticket = Ticket.json_format(ticket_json) 
+    project = Project.query.get(ticket_json.p_id)
+    project_name_list = Project.query.all()
+    project_name_list_json = [Project.json_format(row) for row in project_name_list]
+    priority_array = ["High","Medium","Low"]
+    status_array = ["Open","In Progress","Closed"]
+    data = {
+        "project" : project_name_list_json,
+        "userinfo" : userinfo,
+        "user_project" : project,
+        "role" : userinfo['role'],
+        "username" : userinfo['nickname'],
+        "ticket": ticket,
+        "page": "edit-ticket",
+        "priority_array": priority_array,
+        "status_array":status_array
+    }
+    return render_template('ticketform.html', data = data)

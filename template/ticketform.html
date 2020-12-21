@@ -10,7 +10,7 @@
   
   
   
-  
+	{% if data.page!='edit-ticket'%}
     <div class="testbox">
       <form action="/ticketsubmit" method="POST">
 
@@ -27,7 +27,7 @@
             <input id="t_desc" type="text" name="t_desc" />
           </div>
 
-  <div class="item">
+			<div class="item">
             <label for="t_priority">Priority<span>*</span></label>
 			<select name="t_priority" id="t_priority">
 			  <option value="High">High</option>
@@ -35,7 +35,7 @@
 			  <option value="Low">Low</option>
 			</select>
           </div>
-<div class="item">
+			<div class="item">
             <label for="project">Project<span>*</span></label>
 			<select name="project" id="project">
 			{% for proj in data.project %}
@@ -44,7 +44,7 @@
 			  
 			</select>
           </div>
-  <div class="item">
+			<div class="item">
             <label for="t_type">Type<span>*</span></label>
             <input id="t_type" type="text" name="t_type" />
           </div>
@@ -59,6 +59,82 @@
         </div>
       </form>
     </div>
+	
+	{% elif data.page=='edit-ticket'%}
+	
+	<div class="testbox">
+      <form action="/ticketupdate" method="POST">
+
+        <br/>
+        <fieldset>
+          <legend>Edit Ticket Information</legend>
+           <div class="colums">
+          <div class="item">
+            <label for="t_title"> Title<span>*</span></label>
+            <input id="t_title" type="text" name="t_title" value="{{data.ticket.title}}" />
+          </div>
+          <div class="item">
+            <label for="t_desc"> Description<span>*</span></label>
+            <input id="t_desc" type="text" name="t_desc" value="{{data.ticket.desc}}" />
+          </div>
+			<input id="t_id" type="hidden" name="ticket_id" value={{data.ticket.id}} />
+			<div class="item">
+            <label for="t_status">Status<span>*</span></label>
+			<select name="t_status" id="t_status">
+			{% for s in data.status_array %}
+				{% if s == data.ticket.status %}
+			  <option selected="selected" value={{s}}>{{s}}</option>
+			  {% else %}
+			  <option value={{s}}>{{s}}</option>
+			  {% endif %}
+			 {% endfor %}
+			</select>
+          </div>
+
+	
+			<div class="item">
+            <label for="t_priority">Priority<span>*</span></label>
+			<select name="t_priority" id="t_priority">
+			{% for p in data.priority_array %}
+				{% if p == data.ticket.priority %}
+			  <option selected="selected" value={{p}}>{{p}}</option>
+			  {% else %}
+			  <option value={{p}}>{{p}}</option>
+			  {% endif %}
+			 {% endfor %}
+			</select>
+          </div>
+			<div class="item">
+            <label for="project">Project<span>*</span></label>
+			<select name="project" id="project">
+			{% for proj in data.project %}
+				{% if proj.id == data.ticket.p_id %}
+				<option selected=="selected" value={{ proj.id }}>{{ proj.name }}</option>
+				{% else %}
+				<option value={{ proj.id }}>{{ proj.name }}</option>
+				{% endif %}
+			  {% endfor %}
+			  
+			</select>
+          </div>
+			<div class="item">
+            <label for="t_type">Type<span>*</span></label>
+            <input id="t_type" type="text" name="t_type" value="{{data.ticket.type}}" />
+          </div>
+ 
+
+            
+         
+          </div>
+                </fieldset>
+        <div class="btn-block">
+          <button type="submit" href="/">Submit</button>
+        </div>
+      </form>
+    </div>
+	
+	
+	{% endif %}
 
   </body>
 </html>

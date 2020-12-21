@@ -68,7 +68,7 @@
 									  <option value="Project Manager">Project Manager</option>
 									</select>
 									</div><br>
-									<button type="submit" href="/">Assign</button>
+									<input type="submit" name="input" value="Add" href="/"></input>
 								</div>
 								</fieldset>
 							 </form>
@@ -143,7 +143,7 @@
 										{% for t in data.ticket %}
 											<tr>
 												<td>{{ t.t_id }}</td>
-												<td><a href="../ticketdetails/{{t.t_id}}">{{ t.t_title }}</a></td>
+												<td><a href="/ticketdetails/{{t.t_id}}">{{ t.t_title }}</a></td>
 												<td>{{ t.p_name }}</td>
 												<td>
 													{% if t.t_status =='Open' %}

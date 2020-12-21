@@ -74,6 +74,8 @@ def submit_ticket():
         return redirect(url_for('dev_get_tickets'))
     elif profile['role'] == 'User':
         return redirect(url_for('user_get_tickets'))
+    elif profile['role'] == 'Admin':
+        return redirect(url_for('admin_get_tickets'))
     return ""
 
 
@@ -183,3 +185,65 @@ def assign_dev():
         print(sys.exc_info())
         abort(500)
     return redirect('/ticketdetails/'+ ticket_id) 
+
+
+#UPDATE TICKET
+@app.route("/ticketupdate", methods=['POST'])
+def update_ticket():
+    profile = session.get('profile')
+    to_update_ticket_history = False
+    ticket_id = request.form.get('ticket_id')
+    t_title = request.form.get('t_title')
+    t_desc = request.form.get('t_desc')
+    p_id = request.form.get('project')
+    t_priority = request.form.get('t_priority')
+    t_status = request.form.get('t_status')
+    t_type = request.form.get('t_type')
+    today = date.today()
+    t_update_date = today.strftime("%d/%m/%Y")
+
+
+    ticket_entry = Ticket.query.get(ticket_id)
+    #CHECK IF TICKET HISTORY NEEDS TO BE UPDATED
+    if t_status != ticket_entry.t_status or t_priority != ticket_entry.t_priority:
+        to_update_ticket_history = True
+    
+    ticket_entry.t_title = t_title
+    ticket_entry.t_desc = t_desc
+    ticket_entry.p_id = p_id
+    ticket_entry.t_priority = t_priority
+    ticket_entry.t_status = t_status
+    ticket_entry.t_type = t_type
+
+    try:
+        ticket_entry.update()
+    except:
+        print(sys.exc_info())
+        abort(500)
+    
+    #ENTER IN TICKET HISTORY
+    if to_update_ticket_history:
+        ticket_id = ticket_entry.t_id
+        ticket_history_entry = Ticket_history(ticket_id,ticket_entry.assigned_user_id,t_status,t_update_date,t_priority)
+        try:
+            ticket_history_entry.insert()
+        except:
+            print(sys.exc_info())   
+            abort(500)
+
+    #ENTER IN NOTIFICATIONS
+    user_list = Map_user_proj.query.with_entities(Map_user_proj.user_id).filter(Map_user_proj.p_id == p_id).all()
+    for user in user_list:
+        notification = Notification(ticket_id, user, 'Update')
+        try:
+            notification.insert()
+        except:
+            print(sys.exc_info())
+            abort(500)
+    if profile['role'] == 'Developer':
+        return redirect(url_for('dev_get_tickets'))
+    elif profile['role'] == 'User':
+        return redirect(url_for('user_get_tickets'))
+    elif profile['role'] == 'Admin':
+        return redirect(url_for('admin_get_tickets'))
+    return ""
