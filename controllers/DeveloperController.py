@@ -51,14 +51,15 @@ def dev_get_tickets():
 
     #Get notifications
     notification_list = NotificationController.get_notifications(userinfo['user_id'])
-
+    notification_count = len(notification_list)
     data = {
         "ticket" : ticket_value,
         "userinfo" : userinfo,
         "role" : userinfo['role'],
         "username" : userinfo['nickname'],
         "page" : "tickets",
-        "notification" : notification_list
+        "notification" : notification_list,
+        "notification_count" : notification_count
     }
     
 
@@ -78,13 +79,15 @@ def dev_get_projects():
 
     #Get notifications
     notification_list = NotificationController.get_notifications(userinfo['user_id'])
+    notification_count = len(notification_list)
     data = {
         "userinfo" : userinfo,
         "role" : userinfo['role'],
         "username" : userinfo['nickname'],
         "page" : "projects",
         "project" : project,
-        "notification" : notification_list
+        "notification" : notification_list,
+        "notification_count" : notification_count
     }
     return render_template('mainpage.html', data = data)
 
@@ -109,13 +112,15 @@ def get_dev_assigned_tickets():
 
 
     notification_list = NotificationController.get_notifications(userinfo['user_id'])
+    notification_count = len(notification_list)
     data = {
         "ticket" : ticket,
         "userinfo" : userinfo,
         "role" : userinfo['role'],
         "username" : userinfo['nickname'],
         "page" : "assignedtickets",
-        "notification" : notification_list
+        "notification" : notification_list,
+        "notification_count" : notification_count
     }
     return render_template('mainpage.html', data = data)
 
@@ -135,6 +140,7 @@ def get_dev_submitted_tickets():
         t['datediff'] = abs((d2 - d1).days)
     #Get notifications
     notification_list = NotificationController.get_notifications(userinfo['user_id'])
+    notification_count = len(notification_list)
 
     data = {
         "ticket" : ticket,
@@ -142,6 +148,7 @@ def get_dev_submitted_tickets():
         "role" : userinfo['role'],
         "username" : userinfo['nickname'],
         "page" : "submittedtickets",
-        "notification" : notification_list
+        "notification" : notification_list,
+        "notification_count" : notification_count
     }
     return render_template('mainpage.html', data = data)

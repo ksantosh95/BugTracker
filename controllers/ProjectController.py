@@ -60,3 +60,5 @@ def get_project_details(project_id):
         "userlist" : user_list_json
     }
     return render_template('project_details.html', data = data )
+
+

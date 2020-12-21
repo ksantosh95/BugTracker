@@ -6,7 +6,7 @@ class Ticket_history(db.Model):
     t_history_id = db.Column(db.Integer, primary_key=True)
     t_id = db.Column(db.Integer)
     user_id = db.Column(db.Integer)
-    t_status = db.Column(db.String(10))
+    t_status = db.Column(db.String(20))
     t_update_date = db.Column(db.String(20))
     t_priority = db.Column(db.String(10))
 

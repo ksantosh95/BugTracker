@@ -215,6 +215,9 @@ def update_ticket():
     ticket_entry.t_status = t_status
     ticket_entry.t_type = t_type
 
+    if t_status == "Closed":
+        ticket_entry.t_close_date = t_type
+
     try:
         ticket_entry.update()
     except:
@@ -247,3 +250,54 @@ def update_ticket():
     elif profile['role'] == 'Admin':
         return redirect(url_for('admin_get_tickets'))
     return ""
+
+
+#UPDATE TICKET STATUS
+@app.route("/update-ticket-status", methods=['POST'])
+def update_project_status():
+    userinfo = session.get('profile')
+    ticket_id = request.form.get('ticket_id')
+    ticket_entry = Ticket.query.get(ticket_id)
+    today = date.today()
+    t_update_date = today.strftime("%d/%m/%Y")
+    t_status = request.form.get('input')
+    p_name = request.form.get('p_name')
+    
+    ticket_entry.t_status = t_status
+    try:
+        ticket_entry.update()
+    except:
+        print(sys.exc_info())
+        abort(500)
+
+    if t_status == "Closed":
+        ticket_entry.t_close_date = t_update_date
+
+    #ENTER IN TICKET HISTORY
+    ticket_id = ticket_entry.t_id
+    ticket_history_entry = Ticket_history(ticket_id,ticket_entry.assigned_user_id,t_status,t_update_date,ticket_entry.t_priority)
+    try:
+        ticket_history_entry.insert()
+    except:
+        print(sys.exc_info())   
+        abort(500)
+
+    #ENTER IN NOTIFICATIONS
+    p_id = Project.query.with_entities(Project.p_id).filter(Project.p_name == p_name).one()
+    user_list = Map_user_proj.query.with_entities(Map_user_proj.user_id).filter(Map_user_proj.p_id == p_id).all()
+    for user in user_list:
+        notification = Notification(ticket_id, user, 'Update')
+        try:
+            notification.insert()
+        except:
+            print(sys.exc_info())
+            abort(500)
+
+    #Insert record in comments
+    comment = Comment(ticket_id, userinfo['user_id'],t_update_date, " Updated ticket status to  " + t_status )
+    try:
+        comment.insert()
+    except:
+        print(sys.exc_info())
+        abort(500)
+    return redirect('/ticketdetails/'+ str(ticket_id)) 

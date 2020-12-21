@@ -17,6 +17,8 @@ def get_notifications(user_id):
     notification_list = Notification.query.filter(Notification.user_id == user_id).all()
     return notification_list
 
+
+
 @app.route("/deletenotification")
 def delete_notification():
     ticket_id = request.args.get('ticket_id')

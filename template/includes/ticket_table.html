@@ -58,13 +58,59 @@
 											{% endif %}
                                             <td>{{ t.p_id }}</td>
                                             <td>{{ t.priority }}</td>
-											{% if t.status =='Open' %}
-												<td ><div class="open_btn  ml-2 mr-2 mt-1 mb-1"><b>{{ t.status }}</b></div></td>
-											{% elif t.status == 'In progress' %}
-												<td ><div class="progress_btn  ml-2 mr-2 mt-1 mb-1"><b>{{ t.status }}</b></div></td>
-											{% elif t.status == 'Closed' %}
-												<td ><div class="closed_btn  ml-2 mr-2 mt-1 mb-1"><b>{{ t.status }}</b></div></td>
+											
+											
+											<!-- STATUS -->
+											{% if data.page == 'ticket_detail' and data.role=='Developer'%}
+												{% if t.status =='Open' %}
+													<td ><button id="myBtn" class="open_btn  ml-2 mr-2 mt-1 mb-1">{{ t.status }}</button></td>
+												{% elif t.status == 'In progress' %}
+													<td ><button id="myBtn" class="progress_btn  ml-2 mr-2 mt-1 mb-1">{{ t.status }}</button></td>
+												{% elif t.status == 'Closed' %}
+													<td ><button id="myBtn" class="closed_btn  ml-2 mr-2 mt-1 mb-1">{{ t.status }}</button></td>
+												{% endif %}
+												
+												<!-- The Popup -->
+													<div id="myModal" class="modal1">
+
+													  <!-- Popup content -->
+													  <div class="modal-content-1">
+														<form action="/update-ticket-status" method="POST" class="form-container">
+
+															<br/>
+															<fieldset>
+															<h6> Update Status to : </h6>
+															<div class="item">
+																<input type="submit" class="open_btn  ml-2 mr-2 mt-1 mb-1" name="input" href="/" value="Open">
+																<input type="submit" class="progress_btn  ml-2 mr-2 mt-1 mb-1" name="input" href="/" value="In Progress">
+																<input type="submit" class="closed_btn  ml-2 mr-2 mt-1 mb-1" name="input" href="/" value="Closed">
+																<input type="hidden" name="ticket_id" value="{{t.id}}" />
+																<input type="hidden" name="p_name" value="{{t.p_id}}" />
+															</div>
+															</fieldset>
+														 </form>
+													  </div>
+
+													</div>
+												
+												
+												
+												
+												
+											{%else %}
+											
+												{% if t.status =='Open' %}
+													<td ><div class="open_btn  ml-2 mr-2 mt-1 mb-1"><b>{{ t.status }}</b></div></td>	
+												{% elif t.status == 'In progress' %}
+													<td ><div class="progress_btn  ml-2 mr-2 mt-1 mb-1"><b>{{ t.status }}</b></div></td>
+												{% elif t.status == 'Closed' %}
+													<td ><div class="closed_btn  ml-2 mr-2 mt-1 mb-1"><b>{{ t.status }}</b></div></td>
+												{% endif %}
 											{% endif %}
+											<!-- END OF STATUS -->
+											
+											
+											
 											<td>{{ t.type }}</td>
                                             <td>{{ t.create_date }}</td>
                                             <td>{{ t.close_date }}</td>

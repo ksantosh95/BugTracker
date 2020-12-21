@@ -61,7 +61,7 @@ def upgrade():
     sa.Column('t_history_id', sa.Integer(), nullable=False),
     sa.Column('t_id', sa.Integer(), nullable=True),
     sa.Column('user_id', sa.Integer(), nullable=True),
-    sa.Column('t_status', sa.String(length=10), nullable=True),
+    sa.Column('t_status', sa.String(length=20), nullable=True),
     sa.Column('t_update_date', sa.String(length=20), nullable=True),
     sa.Column('t_priority', sa.String(length=10), nullable=True),
     sa.PrimaryKeyConstraint('t_history_id')
