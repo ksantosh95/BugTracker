@@ -61,7 +61,7 @@
 											
 											
 											<!-- STATUS -->
-											{% if data.page == 'ticket_detail' and data.role=='Developer'%}
+											{% if data.page == 'ticket_detail' and (data.role=='Developer' or data.role=='Project Manager')%}
 												{% if t.status =='Open' %}
 													<td ><button id="myBtn" class="open_btn  ml-2 mr-2 mt-1 mb-1">{{ t.status }}</button></td>
 												{% elif t.status == 'In progress' %}

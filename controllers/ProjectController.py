@@ -20,6 +20,8 @@ from models.UserProjMapModel import Map_user_proj
 from models.UsersModel import Users
 from models.TicketModel import Ticket
 
+from controllers import NotificationController
+
 def project_user_list_to_json(self):
     return {
             "p_id" : self.p_id,
@@ -39,6 +41,8 @@ def redirect_projects():
         return redirect('/dev/projects')
     elif userinfo['role'] == 'Admin':
         return redirect('/admin/projects')
+    elif userinfo['role'] == 'Project Manager':
+        return redirect('/manager/projects')
     return ""
 
 
@@ -70,6 +74,10 @@ def get_project_details(project_id):
     user_list = Users.query.filter(Users.user_role != "Admin").all()
     user_list_json = [Users.json_format(u) for u in user_list]  
 
+    #Get notifications
+    notification_list = NotificationController.get_notifications(userinfo['user_id'])
+    notification_count = len(notification_list)
+
     data = {
         "project" :project,
         "project_users" : project_users,
@@ -78,7 +86,9 @@ def get_project_details(project_id):
         "role" : userinfo['role'],
         "username" : userinfo['nickname'],
         "page" : "project_detail",
-        "userlist" : user_list_json
+        "userlist" : user_list_json,
+        "notification" : notification_list,
+        "notification_count" : notification_count
     }
     return render_template('project_details.html', data = data )
 

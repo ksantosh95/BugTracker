@@ -39,16 +39,17 @@
 									{% endif %}
 											<span class="text"><b>Create Ticket</b></span>
 										</a>
-									{% if data.role != 'User' %}
-										{% if data.page == 'assignedtickets' %}
-											<a href="assignedtickets" class="buttonbar selected-btn-info btn-icon-split">
-										{% else %}
-											<a href="assignedtickets" class="buttonbar btn-info btn-icon-split">	
-										{% endif %}
-												<span class="text"><b>Tickets assigned to me </b></span>
-											</a>
-										
-										{% if data.page == 'tickets' %}
+									{% if data.role != 'User'%}
+											{% if data.role != 'Project Manager'%}
+												{% if data.page == 'assignedtickets' %}
+													<a href="assignedtickets" class="buttonbar selected-btn-info btn-icon-split">
+												{% else %}
+													<a href="assignedtickets" class="buttonbar btn-info btn-icon-split">	
+												{% endif %}
+													<span class="text"><b>Tickets assigned to me </b></span>
+												</a>
+											{% endif %}
+										{% if data.page == 'tickets' or data.page == 'manager_tickets' %}
 											<a href="tickets" class="buttonbar selected-btn-info btn-icon-split">
 										{% else %}
 											<a href="tickets" class="buttonbar btn-info btn-icon-split">

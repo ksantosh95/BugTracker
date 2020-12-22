@@ -30,6 +30,7 @@ from models.UserProjMapModel import Map_user_proj
 from models.NotificationModel import Notification
 
 from controllers import NotificationController
+from controllers import ManagerController
 
 
 
@@ -107,6 +108,8 @@ def submit_ticket():
         return redirect(url_for('user_get_tickets'))
     elif profile['role'] == 'Admin':
         return redirect(url_for('admin_get_tickets'))
+    elif profile['role'] == 'Project Manager':
+        return redirect(url_for('manager_get_tickets'))
     return ""
 
 
@@ -193,6 +196,8 @@ def redirect_tickets():
         return redirect(url_for('user_get_tickets'))
     elif userinfo['role']== 'Admin': 
         return redirect("/admin/tickets")
+    elif userinfo['role'] == 'Project Manager':
+        return redirect(url_for('manager_get_tickets'))
     return ""
 
 
@@ -370,3 +375,9 @@ def update_project_status():
         print(sys.exc_info())
         abort(500)
     return redirect('/ticketdetails/'+ str(ticket_id)) 
+
+def get_submitted_tickets():
+    userinfo = session.get('profile')
+    ticket_list = Ticket.query.filter_by(submitter_email= userinfo['email']).all()
+    ticket = [Ticket.json_format(t) for t in ticket_list]  
+    return ticket

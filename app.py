@@ -78,6 +78,7 @@ from controllers import CommentController
 from controllers import ProjectController
 from controllers import NotificationController
 from controllers import AdminController
+from controllers import ManagerController
 
 @app.route('/callback')
 def callback_handling():
@@ -109,6 +110,8 @@ def redirect_users():
         return redirect('/tickets')
     elif userinfo['role']== 'Admin': 
         return redirect("/admin/user-list")
+    elif userinfo['role']== 'Project Manager': 
+        return redirect("/tickets")
     return ""
 
 
