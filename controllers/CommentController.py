@@ -1,3 +1,13 @@
+#################################################################################################
+#                                                                                               #
+#   Module          :   Comment Controller                                                      #
+#   Operations      :                                                                           #
+#   1.  Submit Comment                     /submitcomment                   Users, Dev, Manager #
+#   Last Update     :    Initial function definition                                            #
+#   Last Update date:   19 Dec 2020                                                             #
+#                                                                                               #
+#################################################################################################
+
 from flask import Flask, jsonify, request, abort, render_template, redirect, url_for,  session
 from app import app, db
 import os, sys
@@ -9,7 +19,10 @@ from models.UsersModel import Users
 from models.CommentModel import Comment
 
 
-
+#################################################################################################
+#   Add Comment                                                                                 #
+#   Incoming Call : Ticket Details page                                                         #
+#################################################################################################
 @app.route('/submitcomment', methods=['POST'])
 def submit_comment():
     comment_text = request.form.get('comment')

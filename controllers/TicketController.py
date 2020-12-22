@@ -1,3 +1,20 @@
+#################################################################################################
+#                                                                                               #
+#   Module          :   Ticket Controller                                                       #
+#   Operations      :                                                                           #
+#   1.  Create Ticket               /createticket                       All end users           #
+#   2.  Submit Ticket               /ticketsubmit                       All end users           #
+#   3.  Ticket Details              /ticketdetails/<int:ticket_id>      All end users           #
+#   4.  Redirect Ticket calls       /tickets                            All end users           #
+#   5.  Assign Dev to Ticket        /assigndev                          Dev , Manager           #
+#   6.  Update Ticket               /ticketupdate                       Admin                   #
+#   7.  Update Ticket Status        /update-ticket-status               Dev , Manager           #
+#   Last Update     :    Added function for updating tickets                                    #
+#   Last Update date:   21 Dec 2020                                                             #
+#                                                                                               #
+#################################################################################################
+
+
 from flask import Flask, jsonify, request, abort, render_template, redirect, url_for, session
 from app import app, db
 import os, sys
@@ -14,10 +31,23 @@ from models.NotificationModel import Notification
 
 from controllers import NotificationController
 
+
+
+########################################### 1  ##################################################
+#   Create Ticket       :   Used to create and submit a ticket                                  #
+#   Incoming call       :   Create Ticket button on landing page                                #
+#   Output              :   Ticket submitted to ticket, ticket history and notification table   #
+#   Algorithm           :   Function (Create Ticket)                                            #
+#                       :   1.  Fetch All projects to show case                                 #
+#                           Function (Ticket Submit)                                            #
+#                           1.  Read inputs. Set userid =0, open date=today, status= Open       #
+#                           2.  Enter into ticket, ticket history and notification              #
+#   Last Modification   :   Added notification creation                                         #
+#################################################################################################
+
 @app.route("/createticket")
 def create_ticket():
     userinfo = session.get('profile')
-    dev_email= userinfo['name']
     project_name_list = Project.query.all()
     project_name_list_json = [Project.json_format(row) for row in project_name_list]
     
@@ -29,6 +59,7 @@ def create_ticket():
     }
     return render_template('ticketform.html', data = data)
 
+########################################### 2  ##################################################
 @app.route("/ticketsubmit", methods=['POST'])
 def submit_ticket():
     profile = session.get('profile')
@@ -79,6 +110,13 @@ def submit_ticket():
     return ""
 
 
+########################################### 3 ###################################################
+#   Fetch Ticket Details    :   Get ticket data, ticket history and developers in the project   #
+#   Incoming Call           :   Called by details link in the ticket table                      #
+#   Input parameter         :   ticket_id                                                       #
+#   Functioning             :   Fetch columns from ticket, ticket history and notifications     #
+#   Last modification       :   Added notification functionality                                #
+#################################################################################################
 
 @app.route("/ticketdetails/<int:ticket_id>")
 def get_ticket_details(ticket_id):
@@ -91,6 +129,7 @@ def get_ticket_details(ticket_id):
 
     userinfo = session.get('profile')
 
+    #SELECT TICKET INFORMATION FOR TICKET_ID. SELECT PROJECT NAME AS 'P_ID'
     sql_ticket = text(""" SELECT tick.t_id, 
                             tick.t_title, 
                             tick.t_desc, 
@@ -123,7 +162,9 @@ def get_ticket_details(ticket_id):
                 .add_columns(Users.user_name, Users.user_id)\
                 .filter(Ticket.t_id == ticket_id).filter(Map_user_proj.user_role == 'Developer').all()
 
+    #Get notifications
     notification_list = NotificationController.get_notifications(userinfo['user_id'])
+    notification_count = len(notification_list)
     data = {
         "ticket" : ticket,
         "ticket_history" : ticket_history,
@@ -133,9 +174,15 @@ def get_ticket_details(ticket_id):
         "page" : "ticket_detail",
         "comment" : comment,
         "dev_list" : dev_list,
-        "notification" : notification_list
+        "notification" : notification_list,
+        "notification_count" : notification_count
     }
     return render_template('ticket_details.html', data = data )
+
+
+############################################ 4 ##################################################
+#   Redirect Tickets    :   Redirects function call to appropriate user page                    #
+#################################################################################################
 
 @app.route("/tickets")
 def redirect_tickets():
@@ -148,8 +195,17 @@ def redirect_tickets():
         return redirect("/admin/tickets")
     return ""
 
+
+############################################ 5 ##################################################
+#   Assign Developer to Ticket  :   Called by Developers/Managers to assign a dev to a ticket   #
+#   Incoming Call               :   Assign Personnel button on Ticket Details page              #
+#   Functioning                 :   1.  Assigned developer is added to ticket table             #
+#                                   2.  Comment is added to comment table                       #
+#                                   3.  'Assigned'  type Notification is added                  #
+#   Last Modification           :   Added notification functionality                            #
+#################################################################################################
+
 @app.route("/assigndev", methods=['POST'])
-#Function to be called when a developer is assinged to a ticket
 def assign_dev():
     ticket_id= request.form.get('ticket_id')
     ticket = Ticket.query.get(ticket_id)
@@ -187,7 +243,13 @@ def assign_dev():
     return redirect('/ticketdetails/'+ ticket_id) 
 
 
-#UPDATE TICKET
+############################################### 6 ###############################################
+#   Update ticket   :   Update Ticket information                                               #
+#   Incoming Call   :   Ticket Edit button on Ticket Details page                               #
+#   Algorithm       :   1.  Ticket table is updated                                             #
+#                       2.  If status or priority is updated, update ticket history             #
+#                       3.  Add 'Update' type notification                                      #
+#################################################################################################
 @app.route("/ticketupdate", methods=['POST'])
 def update_ticket():
     profile = session.get('profile')
@@ -252,7 +314,14 @@ def update_ticket():
     return ""
 
 
-#UPDATE TICKET STATUS
+############################################## 7 ################################################
+#   Update Ticket Status    :   Called by Developer to update the ticket status                 #
+#   Incoming Call           :   Ticket status button on Ticket Details page                     #
+#   Algorithm               :   1.  Update Ticket table                                         #
+#                               2.  Update Ticket history table                                 #
+#                               3.  Add 'Update' type notification to notification table        #
+#   Last Update             :   Added notification                                              #
+#################################################################################################
 @app.route("/update-ticket-status", methods=['POST'])
 def update_project_status():
     userinfo = session.get('profile')

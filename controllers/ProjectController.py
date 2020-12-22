@@ -1,3 +1,14 @@
+#################################################################################################
+#                                                                                               #
+#   Module          :   Project Controller                                                      #
+#   Operations      :                                                                           #
+#   1.  Redirect project queries           /projects                            All end users   #
+#   2.  Project details                    /projectdetails/<int:project_id>     All end users   #
+#   Last Update     :    Initial function definition                                            #
+#   Last Update date:   19 Dec 2020                                                             #
+#                                                                                               #
+#################################################################################################
+
 from flask import Flask, jsonify, request, abort, render_template, redirect, url_for, session
 from app import app, db
 import os, sys
@@ -18,6 +29,9 @@ def project_user_list_to_json(self):
             "email":self.user_email        
         }
 
+#################################################################################################
+#   REDIRECT PROJECTS REQUESTS                                                                  #
+#################################################################################################
 @app.route("/projects")
 def redirect_projects():
     userinfo = session.get('profile')
@@ -27,6 +41,13 @@ def redirect_projects():
         return redirect('/admin/projects')
     return ""
 
+
+#################################################################################################
+#   FETCH PROJECT DETAILS                                                                       #
+#   Algorithm   :   1.  Fetch project information from project table                            #
+#                   2.  Get user list for the project (project_users)                           #
+#                   3.  Get tickets for project (project_tickets)                               #
+#################################################################################################
 @app.route("/projectdetails/<int:project_id>")
 def get_project_details(project_id):
     userinfo = session.get('profile')

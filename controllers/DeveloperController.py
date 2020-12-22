@@ -1,3 +1,16 @@
+#################################################################################################
+#                                                                                               #
+#   Module          :   Developer Controller                                                    #
+#   Operations      :                                                                           #
+#   1.  List of all tickets                     /dev/tickets                      Developer     #
+#   2.  List of all projects for the dev        /dev/projects                     Developer     #
+#   3.  List of tickets assigned to dev         /dev/assignedtickets              Developer     #
+#   4.  List of tickets submitted by dev        /dev/submittedtickets             Developer     #
+#   Last Update     :    Added function for updating tickets                                    #
+#   Last Update date:   21 Dec 2020                                                             #
+#                                                                                               #
+#################################################################################################
+
 from flask import Flask, jsonify, request, abort, render_template, redirect, url_for, session
 from app import app, db
 import os, sys
@@ -11,6 +24,8 @@ from models.UserProjMapModel import Map_user_proj
 from models.UsersModel import Users
 
 from controllers import NotificationController
+
+########################################### 1  ##################################################
 
 @app.route('/dev/tickets', methods=['GET'])
 def dev_get_tickets():
