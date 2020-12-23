@@ -5,3 +5,5 @@ AUTH0_CALLBACK_URL= 'http://127.0.0.1:5000/callback'
 #AUTH0_CALLBACK_URL= 'https://bugtracker-stage.herokuapp.com/callback'
 AUTH0_CLIENT_SECRET = 'KRIcQ3mcZ8YYAoAKObkRkV4QQrvKahUoe5VfnTWMKKHXFsN5SXmEIiOPS2ZrNtU-'
 AUTH0_AUDIENCE = 'bugTrac'
+STATUS = ['Open','Progress','Closed']
+PRIORITY = ['High','Medium','Low']

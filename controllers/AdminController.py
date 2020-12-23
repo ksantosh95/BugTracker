@@ -28,7 +28,7 @@ import os, sys
 from datetime import date
 from sqlalchemy import text
 from datetime import datetime
-
+import constants
 from models.TicketModel import Ticket
 from models.ProjectModel import Project
 from models.UserProjMapModel import Map_user_proj
@@ -326,8 +326,8 @@ def get_ticket_info(ticket_id):
     project = Project.query.get(ticket_json.p_id)
     project_name_list = Project.query.all()
     project_name_list_json = [Project.json_format(row) for row in project_name_list]
-    priority_array = ["High","Medium","Low"]
-    status_array = ["Open","In Progress","Closed"]
+    priority_array = constants.PRIORITY
+    status_array = constants.STATUS
     data = {
         "project" : project_name_list_json,
         "userinfo" : userinfo,

@@ -12,19 +12,78 @@
 #################################################################################################
 
 from flask import Flask, jsonify, request, abort, render_template, redirect, url_for, session
+from decimal import *
 from app import app, db
 import os, sys
 from datetime import date
-from sqlalchemy import text
+from sqlalchemy import text, func
 from datetime import datetime
 
 from models.TicketModel import Ticket
 from models.ProjectModel import Project
 from models.UserProjMapModel import Map_user_proj
 from models.UsersModel import Users
+from models.MonthConfigModel import Month_config
 
 from controllers import NotificationController
 from controllers import TicketController
+
+
+@app.route('/manager-dashboard')
+def get_manager_mainpage():
+    userinfo = session.get('profile')
+    user_id = userinfo['user_id']
+    #Get notifications
+    notification_list = NotificationController.get_notifications(userinfo['user_id'])
+    notification_count = len(notification_list)
+
+    #GET TOTAL OPEN TICKETS
+    total_open_tickets = Ticket.query.join(Map_user_proj, Ticket.p_id == Map_user_proj.p_id)\
+                                    .with_entities(func.count(Ticket.t_id).label('cnt'))\
+                                            .filter(Map_user_proj.user_id == user_id)\
+                                                .filter(Map_user_proj.user_role=='Project Manager')\
+                                                    .filter(Ticket.t_status == 'Open')\
+                                                    .all()
+
+
+
+    #UNASSINGED TICKETS
+    unassigned_tickets = Ticket.query.join(Map_user_proj, Ticket.p_id == Map_user_proj.p_id)\
+                                    .with_entities(func.count(Ticket.t_id).label('cnt'))\
+                                            .filter(Map_user_proj.user_id == user_id)\
+                                                .filter(Map_user_proj.user_role=='Project Manager')\
+                                                    .filter(Ticket.assigned_user_id == 0)\
+                                                    .all()
+    
+    #IN PROGRESS TICKETS
+    in_progress_tickets = Ticket.query.join(Map_user_proj, Ticket.p_id == Map_user_proj.p_id)\
+                                    .with_entities(func.count(Ticket.t_id).label('cnt'))\
+                                            .filter(Map_user_proj.user_id == user_id)\
+                                                .filter(Map_user_proj.user_role=='Project Manager')\
+                                                    .filter(Ticket.t_status == 'Progress')\
+                                                    .all()
+
+    #AVERAGE TIME TAKEN TO RESOLVE PER TICKET
+    query = text("""select CAST(avg_ticket_time as INTEGER) from 
+                    ( select avg(diff) as avg_ticket_time from 
+                        (select (to_date(t_close_date,'DD/MM/YYYY') - to_date(t_create_date,'DD/MM/YYYY')) as diff 
+                            from ticket where t_status='Closed')x)y;""")
+    result = db.session.execute(query)
+    avg_time = [row for row in result]
+
+    data = {
+        "userinfo" : userinfo,
+        "role" : userinfo['role'],
+        "username" : userinfo['nickname'],
+        "page" : "manager_mainpage",
+        "notification" : notification_list,
+        "notification_count" : notification_count,
+        "total_open_tickets" : total_open_tickets[0][0],
+        "unassigned_tickets": unassigned_tickets[0][0],
+        "in_progress_tickets":in_progress_tickets[0][0],
+        "avg_time":avg_time[0][0]
+    }
+    return render_template('manager-mainpage.html', data=data)
 
 #################################################################################################
 #   GET ALL TICKETS FOR PROJECTS UNDER MANAGER                                                  #
@@ -133,3 +192,50 @@ def manager_get_projects():
         "notification_count" : notification_count
     }
     return render_template('mainpage.html', data = data)
+
+#################################################################################################
+#   GET DATAPOINTS FOR DASHBOARD LINE GRAPH                                                     #
+#################################################################################################
+@app.route("/manager-dashboard/project/<int:project_id>")
+def get_project_chart(project_id):
+    userinfo = session.get('profile')
+    user_id = userinfo['user_id']
+    if project_id==0:
+        query = text(""" select mapid.mth_name as mth_name, mapid.p_id as p_id, COALESCE(filter.cnt,0) as cnt from (select config.mth_name, config.mth_id, proj.p_id from month_config config cross join (select p_id from map_user_proj where user_id="""+str(user_id)+"""and user_role='Project Manager') proj) mapid left outer join 
+                        (select count(filter.t_id) as cnt, filter.p_id, date_part('month',filter.date) as month from 
+                        (select tick.t_id,tick.p_id,to_date(tick.t_create_date,'DD/MM/YYYY') as date from ticket tick where p_id in 
+                        (select p_id from map_user_proj where user_id="""+str(user_id)+""" and user_role='Project Manager')) filter group by filter.p_id, date_part('month',filter.date)) filter
+                        on mapid.mth_id = filter.month and mapid.p_id = filter.p_id """)
+        result = db.session.execute(query)
+        chart_data = [Month_config.json_format(row) for row in result]
+    else:
+        query = text(""" SELECT mapid.mth_name          AS mth_name, 
+                                mapid.p_id              AS p_id, 
+                                COALESCE(filter.cnt, 0) AS cnt 
+                            FROM   (SELECT config.mth_name, 
+                                        config.mth_id, 
+                                        proj.p_id 
+                                    FROM   month_config config 
+                                        CROSS JOIN (SELECT """ +str(project_id)+""" as p_id) proj) mapid 
+                                LEFT OUTER JOIN (SELECT Count(filter.t_id)              AS cnt, 
+                                                        filter.p_id, 
+                                                        Date_part('month', filter.date) AS month 
+                                                    FROM   (SELECT tick.t_id, 
+                                                                tick.p_id, 
+                                                                To_date(tick.t_create_date, 'DD/MM/YYYY') 
+                                                                AS 
+                                                                date 
+                                                            FROM   ticket tick 
+                                                            WHERE  p_id = """+str(project_id)+ """) filter 
+                                                    GROUP  BY filter.p_id, 
+                                                            Date_part('month', filter.date)) filter 
+                                                ON mapid.mth_id = filter.month 
+                                                AND mapid.p_id = filter.p_id  """)
+        result = db.session.execute(query)
+        chart_data = [Month_config.json_format(row) for row in result]
+    data = {
+            "chart_data": chart_data,
+            "project_name": ["Bug Tracker", "Test"],
+            "project_id": [1,2]
+        }
+    return data

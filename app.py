@@ -69,6 +69,7 @@ from models.ProjectModel import Project
 from models.UserProjMapModel import Map_user_proj
 from models.CommentModel import Comment
 from models.NotificationModel import Notification
+from models.MonthConfigModel import Month_config
 
 
 from controllers import UserController
@@ -111,7 +112,7 @@ def redirect_users():
     elif userinfo['role']== 'Admin': 
         return redirect("/admin/user-list")
     elif userinfo['role']== 'Project Manager': 
-        return redirect("/tickets")
+        return redirect("/manager-dashboard")
     return ""
 
 

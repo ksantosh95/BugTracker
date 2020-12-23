@@ -6559,6 +6559,10 @@ button.bg-success:focus {
   background-color: #169b6b !important;
 }
 
+.bg-alert {
+  background-color: #DC143C !important;
+}
+
 .bg-info {
   background-color: #36b9cc !important;
 }
@@ -9734,6 +9738,10 @@ a.text-success:hover, a.text-success:focus {
   color: #13855c !important;
 }
 
+.text-alert {
+  color: #DC143C !important;
+}
+
 .text-info {
   color: #36b9cc !important;
 }
@@ -10180,6 +10188,10 @@ a:focus {
 
 .border-bottom-success {
   border-bottom: 0.25rem solid #1cc88a !important;
+}
+
+.border-left-alert {
+  border-left: 0.25rem solid #DC143C !important;
 }
 
 .border-left-info {
