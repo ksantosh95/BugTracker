@@ -30,6 +30,11 @@ class Project(db.Model):
         
         }
 
+    def project_list_json_format(self):
+        return {
+            "id":self.p_id,
+            "name": self.p_name
+        }
 
     def insert(self):
         db.session.add(self)

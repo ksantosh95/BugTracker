@@ -11488,3 +11488,8 @@ body.sidebar-toggled footer.sticky-footer {
   text-decoration: none;
   cursor: pointer;
 }
+
+.div-center {
+	margin-left: auto;
+    margin-right: auto;
+}

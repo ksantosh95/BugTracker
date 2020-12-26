@@ -28,29 +28,46 @@ function number_format(number, decimals, dec_point, thousands_sep) {
 }
 
 
+function selectFunction()
+{
+	var option_value = document.getElementById('project_id').value;
+	renderProject(option_value);
+}
+
 $(document).ready(function(){   
+	renderProject(0);
+
+});
 
 
-$.ajax({
+function renderProject(option_value)
+{
+	$.ajax({
 	
 
-		url:'/manager-dashboard/project/0',
+		url:'/manager-dashboard/project/' + option_value,
 		type:'GET',
 		dataType:'json',
 success:(data) => {  
 
 
 	var data_points = 	[]
-	
+	var color_buffer = 100 / data.project_list.length
 
 
-	for(i in data.project_id)
+
+	for(i in data.project_list)
 		{
+			var r_quotient = 62 + color_buffer;
+			var g_quotient = 28 + color_buffer;
+			var b_quotient = 118 + color_buffer;
+			var light_color_scheme = "rgba("+r_quotient+" , "+g_quotient+" , "+b_quotient+" , 0.05)"
+			var heavy_color_scheme = "rgba("+r_quotient+" , "+g_quotient+" , "+b_quotient+" , 1)"
 			var project_data_points = []
 			var label_points = []
 			for(j=0; j< data.chart_data.length; j++)
 			{	
-				if(data.chart_data[j].p_id == data.project_id[i])
+				if(data.chart_data[j].p_id == data.project_list[i].id)
 				{
 					project_data_points.push(data.chart_data[j].cnt);
 					label_points.push(data.chart_data[j].mth_name)
@@ -58,28 +75,31 @@ success:(data) => {
 				
 			}
 			data_points.push({
-			  
-			  label: data.project_name[i],
+
+			  label: data.project_list[i].name,
 			  lineTension: 0.3,
-			  backgroundColor: "rgba(78, 115, 223, 0.05)",
-			  borderColor: "rgba(78, 115, 223, 1)",
+			  backgroundColor: light_color_scheme,
+			  borderColor: heavy_color_scheme,
 			  pointRadius: 3,
-			  pointBackgroundColor: "rgba(78, 115, 223, 1)",
-			  pointBorderColor: "rgba(78, 115, 223, 1)",
+			  pointBackgroundColor: heavy_color_scheme,
+			  pointBorderColor: heavy_color_scheme,
 			  pointHoverRadius: 3,
-			  pointHoverBackgroundColor: "rgba(78, 115, 223, 1)",
-			  pointHoverBorderColor: "rgba(78, 115, 223, 1)",
+			  pointHoverBackgroundColor: heavy_color_scheme,
+			  pointHoverBorderColor: heavy_color_scheme,
 			  pointHitRadius: 10,
 			  pointBorderWidth: 2,
 			  data: project_data_points,
 				
 			})
 
-			
+			color_buffer = color_buffer + color_buffer
 			
 				}
 			
 	// Area Chart Example
+	$('#myAreaChart').remove();
+      $('#line-chart').append('<canvas id="myAreaChart"><canvas>');
+
 	var ctx = document.getElementById("myAreaChart");
 	var myLineChart = new Chart(ctx, {
 	  type: 'line',
@@ -105,16 +125,25 @@ success:(data) => {
 			time: {
 			  unit: 'date'
 			},
+			scaleLabel: {
+				display: true,
+				labelString: 'Month'
+			  },
 			gridLines: {
 			  display: false,
 			  drawBorder: false
 			},
 			ticks: {
-			  maxTicksLimit: 7
+			  maxTicksLimit: 12
 			}
 		  }],
 		  yAxes: [{
+			scaleLabel: {
+				display: true,
+				labelString: 'Tickets'
+			  },
 			ticks: {
+			  stepSize:5,
 			  maxTicksLimit: 5,
 			  padding: 10,
 			  // Include a dollar sign in the ticks
@@ -132,7 +161,8 @@ success:(data) => {
 		  }],
 		},
 		legend: {
-		  display: false
+		  display: true,
+		  position: "bottom"
 		},
 		tooltips: {
 		  backgroundColor: "rgb(255,255,255)",
@@ -159,5 +189,4 @@ success:(data) => {
 	});
 
 }});
-
-});
+}

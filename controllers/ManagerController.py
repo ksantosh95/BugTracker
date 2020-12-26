@@ -32,6 +32,7 @@ from controllers import TicketController
 @app.route('/manager-dashboard')
 def get_manager_mainpage():
     userinfo = session.get('profile')
+    manager_email = userinfo['email']
     user_id = userinfo['user_id']
     #Get notifications
     notification_list = NotificationController.get_notifications(userinfo['user_id'])
@@ -71,6 +72,13 @@ def get_manager_mainpage():
     result = db.session.execute(query)
     avg_time = [row for row in result]
 
+
+    project_list = Project.query.join(Map_user_proj, Project.p_id == Map_user_proj.p_id)\
+				.join(Users, Users.user_id == Map_user_proj.user_id)\
+				.add_columns(Project.p_id,Project.p_name,Project.p_desc,Project.p_start_date,Project.p_end_date)\
+				.filter(Users.user_email == manager_email).all()
+    project = [Project.json_format(proj) for proj in project_list] 
+
     data = {
         "userinfo" : userinfo,
         "role" : userinfo['role'],
@@ -81,7 +89,8 @@ def get_manager_mainpage():
         "total_open_tickets" : total_open_tickets[0][0],
         "unassigned_tickets": unassigned_tickets[0][0],
         "in_progress_tickets":in_progress_tickets[0][0],
-        "avg_time":avg_time[0][0]
+        "avg_time":avg_time[0][0],
+        "project" : project
     }
     return render_template('manager-mainpage.html', data=data)
 
@@ -201,13 +210,50 @@ def get_project_chart(project_id):
     userinfo = session.get('profile')
     user_id = userinfo['user_id']
     if project_id==0:
-        query = text(""" select mapid.mth_name as mth_name, mapid.p_id as p_id, COALESCE(filter.cnt,0) as cnt from (select config.mth_name, config.mth_id, proj.p_id from month_config config cross join (select p_id from map_user_proj where user_id="""+str(user_id)+"""and user_role='Project Manager') proj) mapid left outer join 
-                        (select count(filter.t_id) as cnt, filter.p_id, date_part('month',filter.date) as month from 
-                        (select tick.t_id,tick.p_id,to_date(tick.t_create_date,'DD/MM/YYYY') as date from ticket tick where p_id in 
-                        (select p_id from map_user_proj where user_id="""+str(user_id)+""" and user_role='Project Manager')) filter group by filter.p_id, date_part('month',filter.date)) filter
-                        on mapid.mth_id = filter.month and mapid.p_id = filter.p_id """)
+        query = text(""" SELECT mapid.mth_name          AS mth_name, 
+                                mapid.p_id              AS p_id, 
+                                COALESCE(filter.cnt, 0) AS cnt 
+                            FROM   (SELECT config.mth_name, 
+                                        config.mth_id, 
+                                        proj.p_id 
+                                    FROM   month_config config 
+                                        CROSS JOIN (SELECT p_id 
+                                                    FROM   map_user_proj 
+                                                    WHERE  user_id = """+str(user_id)+""" 
+                                                            AND user_role = 'Project Manager') proj) mapid 
+                                LEFT OUTER JOIN (SELECT Count(filter.t_id)              AS cnt, 
+                                                        filter.p_id, 
+                                                        Date_part('month', filter.date) AS month 
+                                                    FROM   (SELECT tick.t_id, 
+                                                                tick.p_id, 
+                                                                To_date(tick.t_create_date, 'DD/MM/YYYY') 
+                                                                AS 
+                                                                date 
+                                                            FROM   ticket tick 
+                                                            WHERE  p_id IN (SELECT p_id 
+                                                                            FROM   map_user_proj 
+                                                                            WHERE 
+                                                                user_id = """+str(user_id)+""" 
+                                                                AND user_role = 
+                                                                    'Project Manager')) filter 
+                                                    GROUP  BY filter.p_id, 
+                                                            Date_part('month', filter.date)) filter 
+                                                ON mapid.mth_id = filter.month 
+                                                AND mapid.p_id = filter.p_id  """)
         result = db.session.execute(query)
         chart_data = [Month_config.json_format(row) for row in result]
+
+        project_list_query = text("""SELECT proj.p_id   AS p_id, 
+                                            proj.p_name AS p_name 
+                                        FROM   project proj 
+                                            INNER JOIN map_user_proj map 
+                                                    ON proj.p_id = map.p_id 
+                                        WHERE  map.user_id ="""+str(user_id)+"""
+                                            AND map.user_role = 'Project Manager' """)
+        result = db.session.execute(project_list_query)
+        project_list = [Project.project_list_json_format(row) for row in result]
+
+
     else:
         query = text(""" SELECT mapid.mth_name          AS mth_name, 
                                 mapid.p_id              AS p_id, 
@@ -233,9 +279,21 @@ def get_project_chart(project_id):
                                                 AND mapid.p_id = filter.p_id  """)
         result = db.session.execute(query)
         chart_data = [Month_config.json_format(row) for row in result]
+
+        project_list_query = text("""SELECT proj.p_id   AS p_id, 
+                                            proj.p_name AS p_name 
+                                        FROM   project proj 
+                                            INNER JOIN map_user_proj map 
+                                                    ON proj.p_id = map.p_id 
+                                        WHERE  map.user_id ="""+str(user_id)+"""
+                                            AND map.p_id = """+str(project_id)+ """
+                                            AND map.user_role = 'Project Manager' """)
+        result = db.session.execute(project_list_query)
+        project_list = [Project.project_list_json_format(row) for row in result]
+
+
     data = {
             "chart_data": chart_data,
-            "project_name": ["Bug Tracker", "Test"],
-            "project_id": [1,2]
+            "project_list": project_list
         }
     return data

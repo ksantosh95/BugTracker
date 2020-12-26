@@ -131,6 +131,16 @@
 					<!-- LINE GRAPH -->
 					<div class = "card shadow">
 					
+					<div class="div-center mt-2">
+						<select name="project_id" id="project_id" style="width: 15rem; height:2rem" onChange="selectFunction()">
+						  <option selected="selected" value="0">All Projects</option>
+						{% for proj in data.project %}
+						  <option value="{{proj.id}}">{{proj.name}}</option>
+						{% endfor %}
+						</select>
+						
+					</div>
+					
 					<!-- Content Row -->
                     <div class="row mt-4 ml-2 mr-2">
 
@@ -139,15 +149,14 @@
                             <!-- Area Chart -->
                             <div class="card shadow mb-4">
                                 <div class="card-header py-3">
-                                    <h6 class="m-0 font-weight-bold text-primary">Area Chart</h6>
+                                    <h6 class="m-0 font-weight-bold text-primary"># Ticket Comparison</h6>
                                 </div>
                                 <div class="card-body">
-                                    <div class="chart-area">
+                                    <div class="chart-area" id="line-chart">
                                         <canvas id="myAreaChart"></canvas>
                                     </div>
                                     <hr>
-                                    Styling for the area chart can be found in the
-                                    <code>/js/demo/chart-area-demo.js</code> file.
+                                    
                                 </div>
                             </div>
 
@@ -168,8 +177,7 @@
                                         <canvas id="myPieChart"></canvas>
                                     </div>
                                     <hr>
-                                    Styling for the donut chart can be found in the
-                                    <code>/js/demo/chart-pie-demo.js</code> file.
+                                    
                                 </div>
                             </div>
                         </div>
