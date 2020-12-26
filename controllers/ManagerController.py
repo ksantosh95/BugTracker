@@ -38,40 +38,6 @@ def get_manager_mainpage():
     notification_list = NotificationController.get_notifications(userinfo['user_id'])
     notification_count = len(notification_list)
 
-    #GET TOTAL OPEN TICKETS
-    total_open_tickets = Ticket.query.join(Map_user_proj, Ticket.p_id == Map_user_proj.p_id)\
-                                    .with_entities(func.count(Ticket.t_id).label('cnt'))\
-                                            .filter(Map_user_proj.user_id == user_id)\
-                                                .filter(Map_user_proj.user_role=='Project Manager')\
-                                                    .filter(Ticket.t_status == 'Open')\
-                                                    .all()
-
-
-
-    #UNASSINGED TICKETS
-    unassigned_tickets = Ticket.query.join(Map_user_proj, Ticket.p_id == Map_user_proj.p_id)\
-                                    .with_entities(func.count(Ticket.t_id).label('cnt'))\
-                                            .filter(Map_user_proj.user_id == user_id)\
-                                                .filter(Map_user_proj.user_role=='Project Manager')\
-                                                    .filter(Ticket.assigned_user_id == 0)\
-                                                    .all()
-    
-    #IN PROGRESS TICKETS
-    in_progress_tickets = Ticket.query.join(Map_user_proj, Ticket.p_id == Map_user_proj.p_id)\
-                                    .with_entities(func.count(Ticket.t_id).label('cnt'))\
-                                            .filter(Map_user_proj.user_id == user_id)\
-                                                .filter(Map_user_proj.user_role=='Project Manager')\
-                                                    .filter(Ticket.t_status == 'Progress')\
-                                                    .all()
-
-    #AVERAGE TIME TAKEN TO RESOLVE PER TICKET
-    query = text("""select CAST(avg_ticket_time as INTEGER) from 
-                    ( select avg(diff) as avg_ticket_time from 
-                        (select (to_date(t_close_date,'DD/MM/YYYY') - to_date(t_create_date,'DD/MM/YYYY')) as diff 
-                            from ticket where t_status='Closed')x)y;""")
-    result = db.session.execute(query)
-    avg_time = [row for row in result]
-
 
     project_list = Project.query.join(Map_user_proj, Project.p_id == Map_user_proj.p_id)\
 				.join(Users, Users.user_id == Map_user_proj.user_id)\
@@ -86,10 +52,6 @@ def get_manager_mainpage():
         "page" : "manager_mainpage",
         "notification" : notification_list,
         "notification_count" : notification_count,
-        "total_open_tickets" : total_open_tickets[0][0],
-        "unassigned_tickets": unassigned_tickets[0][0],
-        "in_progress_tickets":in_progress_tickets[0][0],
-        "avg_time":avg_time[0][0],
         "project" : project
     }
     return render_template('manager-mainpage.html', data=data)
@@ -296,4 +258,98 @@ def get_project_chart(project_id):
             "chart_data": chart_data,
             "project_list": project_list
         }
+    return data
+
+
+#################################################################################################
+#   GET DATAPOINTS FOR DASHBOARD CARDS                                                          #
+#################################################################################################
+@app.route('/manager-dashboard-cards/<int:project_id>')
+def get_manager_mainpage_cards(project_id): 
+    userinfo = session.get('profile')
+    manager_email = userinfo['email']
+    user_id = userinfo['user_id']
+    if project_id == 0:
+        #GET TOTAL OPEN TICKETS
+        total_open_tickets = Ticket.query.join(Map_user_proj, Ticket.p_id == Map_user_proj.p_id)\
+                                        .with_entities(func.count(Ticket.t_id).label('cnt'))\
+                                                .filter(Map_user_proj.user_id == user_id)\
+                                                    .filter(Map_user_proj.user_role=='Project Manager')\
+                                                        .filter(Ticket.t_status == 'Open')\
+                                                        .all()
+
+
+
+        #UNASSINGED TICKETS
+        unassigned_tickets = Ticket.query.join(Map_user_proj, Ticket.p_id == Map_user_proj.p_id)\
+                                        .with_entities(func.count(Ticket.t_id).label('cnt'))\
+                                                .filter(Map_user_proj.user_id == user_id)\
+                                                    .filter(Map_user_proj.user_role=='Project Manager')\
+                                                        .filter(Ticket.assigned_user_id == 0)\
+                                                        .all()
+        
+        #IN PROGRESS TICKETS
+        in_progress_tickets = Ticket.query.join(Map_user_proj, Ticket.p_id == Map_user_proj.p_id)\
+                                        .with_entities(func.count(Ticket.t_id).label('cnt'))\
+                                                .filter(Map_user_proj.user_id == user_id)\
+                                                    .filter(Map_user_proj.user_role=='Project Manager')\
+                                                        .filter(Ticket.t_status == 'Progress')\
+                                                        .all()
+
+        #AVERAGE TIME TAKEN TO RESOLVE PER TICKET
+        query = text("""select CAST(avg_ticket_time as INTEGER) from 
+                        ( select avg(diff) as avg_ticket_time from 
+                            (select (to_date(t_close_date,'DD/MM/YYYY') - to_date(t_create_date,'DD/MM/YYYY')) as diff 
+                                from ticket where t_status='Closed')x)y;""")
+        result = db.session.execute(query)
+        avg_time = [row for row in result]
+
+    else:
+        #GET TOTAL OPEN TICKETS
+        total_open_tickets = Ticket.query.join(Map_user_proj, Ticket.p_id == Map_user_proj.p_id)\
+                                        .with_entities(func.count(Ticket.t_id).label('cnt'))\
+                                                .filter(Map_user_proj.user_id == user_id)\
+                                                    .filter(Map_user_proj.user_role=='Project Manager')\
+                                                        .filter(Map_user_proj.p_id == project_id)\
+                                                        .filter(Ticket.t_status == 'Open')\
+                                                        .all()
+
+
+
+        #UNASSINGED TICKETS
+        unassigned_tickets = Ticket.query.join(Map_user_proj, Ticket.p_id == Map_user_proj.p_id)\
+                                        .with_entities(func.count(Ticket.t_id).label('cnt'))\
+                                                .filter(Map_user_proj.user_id == user_id)\
+                                                    .filter(Map_user_proj.user_role=='Project Manager')\
+                                                        .filter(Map_user_proj.p_id == project_id)\
+                                                        .filter(Ticket.assigned_user_id == 0)\
+                                                        .all()
+        
+        #IN PROGRESS TICKETS
+        in_progress_tickets = Ticket.query.join(Map_user_proj, Ticket.p_id == Map_user_proj.p_id)\
+                                        .with_entities(func.count(Ticket.t_id).label('cnt'))\
+                                                .filter(Map_user_proj.user_id == user_id)\
+                                                    .filter(Map_user_proj.user_role=='Project Manager')\
+                                                        .filter(Map_user_proj.p_id == project_id)\
+                                                        .filter(Ticket.t_status == 'Progress')\
+                                                        .all()
+
+        #AVERAGE TIME TAKEN TO RESOLVE PER TICKET
+        query = text("""select CAST(avg_ticket_time as INTEGER) from 
+                        ( select avg(diff) as avg_ticket_time from 
+                            (select (to_date(t_close_date,'DD/MM/YYYY') - to_date(t_create_date,'DD/MM/YYYY')) as diff 
+                                from ticket where t_status='Closed' and p_id = """ +str(project_id)+""")x)y;""")
+        result = db.session.execute(query)
+        avg_time = [row for row in result]
+
+    data = {
+        "userinfo" : userinfo,
+        "role" : userinfo['role'],
+        "username" : userinfo['nickname'],
+        "page" : "manager_mainpage_cards",
+        "total_open_tickets" : total_open_tickets[0][0],
+        "unassigned_tickets": unassigned_tickets[0][0],
+        "in_progress_tickets":in_progress_tickets[0][0],
+        "avg_time":avg_time[0][0]
+    }
     return data

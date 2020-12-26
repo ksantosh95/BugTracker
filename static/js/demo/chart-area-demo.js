@@ -30,22 +30,63 @@ function number_format(number, decimals, dec_point, thousands_sep) {
 
 function selectFunction()
 {
-	var option_value = document.getElementById('project_id').value;
-	renderProject(option_value);
+	var project_id = document.getElementById('project_id').value;
+	renderCardsInfo(project_id);
+	renderProject(project_id);
 }
 
 $(document).ready(function(){   
+	renderCardsInfo(0);
 	renderProject(0);
 
 });
 
 
-function renderProject(option_value)
+function renderCardsInfo(project_id)
 {
 	$.ajax({
 	
 
-		url:'/manager-dashboard/project/' + option_value,
+		url:'/manager-dashboard-cards/' + project_id,
+		type:'GET',
+		dataType:'json',
+success:(data) => {  
+	$('#open_tickets').html(JSON.stringify(data.total_open_tickets));
+
+	$('#unassigned_tickets').html(JSON.stringify(data.unassigned_tickets));
+	$('#unassinged-progress-bar').remove();
+	var unassinged_perc = (data.unassigned_tickets * 100 / data.total_open_tickets) + "%";
+	var unassigned_progress_bar = "<div id='unassinged-progress-bar' class='progress-bar bg-warning' role='progressbar' style='width: "+unassinged_perc+"' aria-valuenow='30' aria-valuemin='0' aria-valuemax='100'></div>"
+	$('#unassigned_percentage').append(unassigned_progress_bar)
+
+	
+	$('#in_progress_tickets').html(JSON.stringify(data.in_progress_tickets));
+	$('#in-progress-progress-bar').remove();
+	var in_progress_perc = (data.in_progress_tickets * 100 / data.total_open_tickets) + "%";
+	var in_progress_progress_bar = "<div id= 'in-progress-progress-bar' class='progress-bar bg-success' role='progressbar' style='width: "+in_progress_perc+"' aria-valuenow='30' aria-valuemin='0' aria-valuemax='100'></div>"
+	$('#in_progress_percentage').append(in_progress_progress_bar)
+
+	if (data.avg_time == null)
+	{
+		var avg_time = '-';
+	}
+	else
+	{
+		var avg_time = data.avg_time;
+	}
+	$('#time_per_ticket').html(avg_time);
+
+}
+	});
+
+}
+
+function renderProject(project_id)
+{
+	$.ajax({
+	
+
+		url:'/manager-dashboard/project/' + project_id,
 		type:'GET',
 		dataType:'json',
 success:(data) => {  
