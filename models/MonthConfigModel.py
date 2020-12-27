@@ -3,12 +3,16 @@ from sqlalchemy.dialects.postgresql import JSON
 
 
 class Month_config(db.Model):
-    mth_id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
+    mth_id = db.Column(db.Integer)
     mth_name = db.Column(db.String(40))
+    year = db.Column(db.String(40))
 
 
-    def __init__(self, mth_name):
+    def __init__(self, mth_id, mth_name, year):
+        self.mth_id = mth_id
         self.mth_name = mth_name
+        self.year = year
 
 
 
@@ -19,6 +23,12 @@ class Month_config(db.Model):
         return {
             "mth_name":self.mth_name,
             "p_id":self.p_id,
+            "cnt":self.cnt
+        }
+    
+    def piechart_json(self):
+        return {
+            "priority":self.priority,
             "cnt":self.cnt
         }
 

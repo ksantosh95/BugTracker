@@ -15,7 +15,7 @@ from flask import Flask, jsonify, request, abort, render_template, redirect, url
 from decimal import *
 from app import app, db
 import os, sys
-from datetime import date
+from datetime import date, datetime
 from sqlalchemy import text, func
 from datetime import datetime
 
@@ -171,21 +171,26 @@ def manager_get_projects():
 def get_project_chart(project_id):
     userinfo = session.get('profile')
     user_id = userinfo['user_id']
+    mth_id = datetime.now().month
+    year = datetime.now().year
+
     if project_id==0:
         query = text(""" SELECT mapid.mth_name          AS mth_name, 
                                 mapid.p_id              AS p_id, 
                                 COALESCE(filter.cnt, 0) AS cnt 
                             FROM   (SELECT config.mth_name, 
                                         config.mth_id, 
+										config.year,
                                         proj.p_id 
-                                    FROM   month_config config 
+                                    FROM   (select * from month_config where id <= (select id from month_config where mth_id = """+str(mth_id)+ """ and year= """ +str(year)+""") and id >= (select id - 11 from month_config where mth_id = """+str(mth_id)+ """ and year= """ +str(year)+""")) config 
                                         CROSS JOIN (SELECT p_id 
                                                     FROM   map_user_proj 
-                                                    WHERE  user_id = """+str(user_id)+""" 
+                                                    WHERE  user_id = """ +str(user_id)+"""
                                                             AND user_role = 'Project Manager') proj) mapid 
                                 LEFT OUTER JOIN (SELECT Count(filter.t_id)              AS cnt, 
                                                         filter.p_id, 
-                                                        Date_part('month', filter.date) AS month 
+                                                        Date_part('month', filter.date) AS month ,
+														Date_part('year', filter.date) AS yr
                                                     FROM   (SELECT tick.t_id, 
                                                                 tick.p_id, 
                                                                 To_date(tick.t_create_date, 'DD/MM/YYYY') 
@@ -195,13 +200,15 @@ def get_project_chart(project_id):
                                                             WHERE  p_id IN (SELECT p_id 
                                                                             FROM   map_user_proj 
                                                                             WHERE 
-                                                                user_id = """+str(user_id)+""" 
+                                                                user_id = """ +str(user_id)+"""
                                                                 AND user_role = 
                                                                     'Project Manager')) filter 
                                                     GROUP  BY filter.p_id, 
-                                                            Date_part('month', filter.date)) filter 
+                                                            Date_part('month', filter.date),
+															Date_part('year', filter.date)) filter 
                                                 ON mapid.mth_id = filter.month 
-                                                AND mapid.p_id = filter.p_id  """)
+												AND mapid.year = filter.yr
+                                                AND mapid.p_id = filter.p_id """)
         result = db.session.execute(query)
         chart_data = [Month_config.json_format(row) for row in result]
 
@@ -222,23 +229,27 @@ def get_project_chart(project_id):
                                 COALESCE(filter.cnt, 0) AS cnt 
                             FROM   (SELECT config.mth_name, 
                                         config.mth_id, 
+										config.year,
                                         proj.p_id 
-                                    FROM   month_config config 
+                                    FROM   (select * from month_config where id <= (select id from month_config where mth_id = """+str(mth_id)+ """ and year= """ +str(year)+""") and id >= (select id - 11 from month_config where mth_id = """+str(mth_id)+ """ and year= """ +str(year)+""")) config 
                                         CROSS JOIN (SELECT """ +str(project_id)+""" as p_id) proj) mapid 
                                 LEFT OUTER JOIN (SELECT Count(filter.t_id)              AS cnt, 
                                                         filter.p_id, 
-                                                        Date_part('month', filter.date) AS month 
+                                                        Date_part('month', filter.date) AS month ,
+														Date_part('year', filter.date) AS yr
                                                     FROM   (SELECT tick.t_id, 
                                                                 tick.p_id, 
                                                                 To_date(tick.t_create_date, 'DD/MM/YYYY') 
                                                                 AS 
                                                                 date 
                                                             FROM   ticket tick 
-                                                            WHERE  p_id = """+str(project_id)+ """) filter 
+                                                            WHERE  p_id ="""+str(project_id)+ """) filter 
                                                     GROUP  BY filter.p_id, 
-                                                            Date_part('month', filter.date)) filter 
+                                                            Date_part('month', filter.date),
+															Date_part('year', filter.date)) filter 
                                                 ON mapid.mth_id = filter.month 
-                                                AND mapid.p_id = filter.p_id  """)
+												AND mapid.year = filter.yr
+                                                AND mapid.p_id = filter.p_id """)
         result = db.session.execute(query)
         chart_data = [Month_config.json_format(row) for row in result]
 
@@ -352,4 +363,103 @@ def get_manager_mainpage_cards(project_id):
         "in_progress_tickets":in_progress_tickets[0][0],
         "avg_time":avg_time[0][0]
     }
+    return data
+
+
+#################################################################################################
+#   GET DATAPOINTS FOR DASHBOARD PIE CHART                                                      #
+#################################################################################################
+@app.route('/manager-dashboard-piechart/<int:project_id>')
+def get_manager_mainpage_piechart(project_id): 
+    userinfo = session.get('profile')
+    manager_email = userinfo['email']
+    user_id = userinfo['user_id']
+    mth_id = str(datetime.now().month)
+    year = str(datetime.now().year)
+    if project_id == 0:
+        query = text(""" SELECT index.left_pri   AS priority,
+                            COALESCE(cnt, 0) AS cnt 
+                        FROM   (SELECT 'Low' AS left_pri 
+                                UNION 
+                                SELECT 'Medium' 
+                                UNION 
+                                SELECT 'High')index 
+                            LEFT OUTER JOIN (SELECT filter.t_priority AS priority, 
+                                                    Count(*)          AS cnt 
+                                                FROM   (SELECT tick.t_id, 
+                                                            tick.p_id, 
+                                                            tick.t_priority, 
+                                                            To_date(tick.t_create_date, 'DD/MM/YYYY') 
+                                                            AS 
+                                                            date 
+                                                        FROM   ticket tick 
+                                                        WHERE  p_id IN (SELECT p_id 
+                                                                        FROM   map_user_proj 
+                                                                        WHERE  user_id = """+str(user_id)+""" 
+                                                                            AND user_role = 
+                                                                                'Project Manager')) 
+                                                    filter 
+                                                    INNER JOIN (SELECT * 
+                                                                FROM   month_config 
+                                                                WHERE  id <= (SELECT id 
+                                                                                FROM   month_config 
+                                                                                WHERE  mth_id = """+mth_id+""" 
+                                                                                        AND year = """+year+""") 
+                                                                        AND id >= (SELECT id - 11 
+                                                                                    FROM   month_config 
+                                                                                    WHERE 
+                                                                            mth_id = """+mth_id+""" 
+                                                                            AND year = """+year+""")) 
+                                                                config 
+                                                            ON Date_part('month', filter.date) = 
+                                                                config.mth_id 
+                                                                AND Date_part('year', filter.date) = 
+                                                                    config.year 
+                                                GROUP  BY filter.t_priority)tab 
+                                            ON index.left_pri = tab.priority  """)
+        result = db.session.execute(query)
+        piechart_data = [Month_config.piechart_json(row) for row in result]
+
+    else:
+        query = text(""" SELECT index.left_pri   AS priority,
+                            COALESCE(cnt, 0) AS cnt 
+                        FROM   (SELECT 'Low' AS left_pri 
+                                UNION 
+                                SELECT 'Medium' 
+                                UNION 
+                                SELECT 'High')index 
+                            LEFT OUTER JOIN (SELECT filter.t_priority AS priority, 
+                                                    Count(*)          AS cnt 
+                                                FROM   (SELECT tick.t_id, 
+                                                            tick.p_id, 
+                                                            tick.t_priority, 
+                                                            To_date(tick.t_create_date, 'DD/MM/YYYY') 
+                                                            AS 
+                                                            date 
+                                                        FROM   ticket tick 
+                                                        WHERE  p_id ="""+str(project_id)+ """) 
+                                                    filter 
+                                                    INNER JOIN (SELECT * 
+                                                                FROM   month_config 
+                                                                WHERE  id <= (SELECT id 
+                                                                                FROM   month_config 
+                                                                                WHERE  mth_id = """+mth_id+""" 
+                                                                                        AND year = """+year+""") 
+                                                                        AND id >= (SELECT id - 11 
+                                                                                    FROM   month_config 
+                                                                                    WHERE 
+                                                                            mth_id = """+mth_id+""" 
+                                                                            AND year = """+year+""")) 
+                                                                config 
+                                                            ON Date_part('month', filter.date) = 
+                                                                config.mth_id 
+                                                                AND Date_part('year', filter.date) = 
+                                                                    config.year 
+                                                GROUP  BY filter.t_priority)tab 
+                                            ON index.left_pri = tab.priority  """)
+        result = db.session.execute(query)
+        piechart_data = [Month_config.piechart_json(row) for row in result]
+    data = {
+            "piechart_data": piechart_data
+        }
     return data

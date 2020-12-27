@@ -31,3 +31,30 @@ insert into ticket_history values (1,1,1,'Open','04/12/2020','Low');
 COMMENT
 -------
 insert into comment values (1,1,1,'05/12/2020','Test comment functionality');
+
+Month_Config
+----
+insert into month_config values (1,'Jan','2020');
+insert into month_config values (2,'Feb','2020');
+insert into month_config values (3,'Mar','2020');
+insert into month_config values (4,'Apr','2020');
+insert into month_config values (5,'May','2020');
+insert into month_config values (6,'Jun','2020');
+insert into month_config values (7,'Jul','2020');
+insert into month_config values (8,'Aug','2020');
+insert into month_config values (9,'Sep','2020');
+insert into month_config values (10,'Oct','2020');
+insert into month_config values (11,'Nov','2020');
+insert into month_config values (12,'Dec','2020');
+insert into month_config values (13,'Jan','2021');
+insert into month_config values (14,'Feb','2021');
+insert into month_config values (15,'Mar','2021');
+insert into month_config values (16,'Apr','2021');
+insert into month_config values (17,'May','2021');
+insert into month_config values (18,'Jun','2021');
+insert into month_config values (19,'Jul','2021');
+insert into month_config values (20,'Aug','2021');
+insert into month_config values (21,'Sep','2021');
+insert into month_config values (22,'Oct','2021');
+insert into month_config values (23,'Nov','2021');
+insert into month_config values (24,'Dec','2021');

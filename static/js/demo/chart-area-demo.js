@@ -33,11 +33,13 @@ function selectFunction()
 	var project_id = document.getElementById('project_id').value;
 	renderCardsInfo(project_id);
 	renderProject(project_id);
+	renderPieChart(project_id);
 }
 
 $(document).ready(function(){   
 	renderCardsInfo(0);
 	renderProject(0);
+	renderPieChart(0);
 
 });
 
@@ -230,4 +232,71 @@ success:(data) => {
 	});
 
 }});
+}
+
+
+
+
+function renderPieChart(project_id)
+{
+	
+	$.ajax({
+	
+
+		url:'/manager-dashboard-piechart/' + project_id,
+		type:'GET',
+		dataType:'json',
+	success:(data) => {  
+	
+	var label_points = [];
+	var data_points = [];
+	
+	for(i=0 ; i  < data.piechart_data.length; i++)
+	{
+		label_points.push(data.piechart_data[i].priority);
+		data_points.push(data.piechart_data[i].cnt)
+	}
+	
+	// Pie Chart Example
+	
+	$('#myPieChart').remove();
+      $('#pie-chart').append('<canvas id="myPieChart"><canvas>');
+	  
+var ctx = document.getElementById("myPieChart");
+var myPieChart = new Chart(ctx, {
+  type: 'doughnut',
+  data: {
+    labels: label_points,
+    datasets: [{
+      data: data_points,
+      backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc'],
+      hoverBackgroundColor: ['#2e59d9', '#17a673', '#2c9faf'],
+      hoverBorderColor: "rgba(234, 236, 244, 1)",
+    }],
+  },
+  options: {
+    maintainAspectRatio: false,
+    tooltips: {
+      backgroundColor: "rgb(255,255,255)",
+      bodyFontColor: "#858796",
+      borderColor: '#dddfeb',
+      borderWidth: 1,
+      xPadding: 15,
+      yPadding: 15,
+      displayColors: true,
+      caretPadding: 10,
+    },
+    legend: {
+
+      display: true,
+	  position: "bottom"
+
+    },
+    cutoutPercentage: 80,
+  },
+});
+
+
+}});
+
 }
