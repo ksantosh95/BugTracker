@@ -14,24 +14,38 @@
 			
 			<!-- Divider -->
             <hr class="sidebar-divider my-2	">
-			
-            <li class="nav-item ml-5">
-                <a class="nav-link" href="/admin/user-list">
-					<i class="fas fa-users"></i>
-                  <span	>Users</span></a>
-            </li>
+				{% if data.page == 'user-details' or data.page=='user-list' %}
+				<li class="nav-item ml-5">
+					<a class="nav-link" href="/admin/user-list">
+						<i class="fas fa-users text-white"></i>
+					  <span	><b class="text-white ">Users</b></span></a>
+				</li>
+				{% else %}
+				<li class="nav-item ml-5">
+					<a class="nav-link" href="/admin/user-list">
+						<i class="fas fa-users"></i>
+					  <span	>Users</span></a>
+				</li>
+				{% endif %}
 			{% endif %}
 			
 			{% if data.role == 'Project Manager' %}
 			
 			<!-- Divider -->
             <hr class="sidebar-divider my-2	">
-			
-            <li class="nav-item ml-5">
-                <a class="nav-link" href="/manager-dashboard">
-					<i class="fas fa-users"></i>
-                  <span	>Dashboard</span></a>
-            </li>
+				{% if data.page == 'manager_mainpage' %}
+				<li class="nav-item ml-5">
+					<a class="nav-link" href="/manager-dashboard">
+						<i class="fas fa-users text-white"></i>
+					  <span	><b class="text-white ">Dashboard</b></span></a>
+				</li>
+				{% else %}
+				<li class="nav-item ml-5">
+					<a class="nav-link" href="/manager-dashboard">
+						<i class="fas fa-users "></i>
+					  <span	>Dashboard</span></a>
+				</li>
+				{% endif %}
 			{% endif %}
 			
 			
@@ -39,12 +53,20 @@
             <hr class="sidebar-divider my-2	">
 
             <!-- Nav Item - Dashboard -->
-            <li class="nav-item ml-5">
-                <a class="nav-link" href="../tickets">
-                    <i class="fas fa-fw fa-table"></i>
-                  <span	>Tickets</span></a>
-            </li>
+			{% if data.page == 'manager_tickets' or data.page =='ticket_detail' or data.page=='tickets' or data.page=='assignedtickets' or data.page=='submittedtickets'%}
+				<li class="nav-item ml-5">
+					<a class="nav-link" href="../tickets">
+						<i class="fas fa-fw fa-table text-white"></i>
+					  <span	><b class="text-white ">Tickets</b></span></a>
+				</li>
+			{% else %}
+					<li class="nav-item ml-5">
+					<a class="nav-link" href="../tickets">
+						<i class="fas fa-fw fa-table"></i>
+					  <span	>Tickets</span></a>
+				</li>
 
+			{% endif %}
             
 			
 			{% if data.role != 'User' %}
@@ -52,12 +74,19 @@
 			<!-- Divider -->
             <hr class="sidebar-divider my-2">
 			
-			
-            <li class="nav-item ml-5 mb-2">
-                <a class="nav-link" href="../projects">
-					<i class="fa fa-tasks"></i>
-                  <span	>Projects</span></a>
-            </li>
+				{% if data.page == 'projects' or data.page=='project_detail' %}
+				<li class="nav-item ml-5 mb-2">
+					<a class="nav-link" href="../projects">
+						<i class="fa fa-tasks text-white"></i>
+					  <span	><b class="text-white ">Projects</b></span></a>
+				</li>
+				{% else %}
+				<li class="nav-item ml-5 mb-2">
+					<a class="nav-link" href="../projects">
+						<i class="fa fa-tasks"></i>
+					  <span	>Projects</span></a>
+				</li>
+				{% endif %}
 			{% endif %}
 			<!-- Divider -->
             <hr class="sidebar-divider">

@@ -132,7 +132,7 @@
 					<div class = "card shadow">
 					
 					<div class="div-center mt-2">
-						<select name="project_id" id="project_id" style="width: 15rem; height:2rem" onChange="selectFunction()">
+						<select class="selected-btn-info" name="project_id" id="project_id" style="width: 15rem; height:2rem" onChange="selectFunction()">
 						  <option selected="selected" value="0">All Projects</option>
 						{% for proj in data.project %}
 						  <option value="{{proj.id}}">{{proj.name}}</option>
@@ -173,7 +173,7 @@
                                 </div>
                                 <!-- Card Body -->
                                 <div class="card-body">
-                                    <div class="chart-pie pt-3 " id="pie-chart">
+                                    <div class="chart-pie pt-3 div-pie-chart" id="pie-chart">
                                         <canvas id="myPieChart"></canvas>
 								
                                     </div>
