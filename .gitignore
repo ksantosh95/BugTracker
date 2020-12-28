@@ -2,3 +2,5 @@ __pycache__
 env
 node_modules
 migrations
+Data_Model.xlsx
+Test_data_entry

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>New Project</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700" rel="stylesheet">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+
+      <link href="/static/css/form.css" rel="stylesheet" type="text/css">
+
+  </head>
+  <body>
+  
+  
+  
+  
+    <div class="testbox">
+		{% if data.page == 'create-project'%}
+      <form action="/admin/project-submit" method="POST">
+
+        <br/>
+        <fieldset>
+          <legend>Project Information</legend>
+           <div class="colums">
+			  <div class="item">
+				<label for="proj_name"> Name<span>*</span></label>
+				<input id="proj_name" type="text" name="proj_name" />
+			  </div>
+			  <div class="item">
+				<label for="proj_desc"> Description<span>*</span></label>
+				<input id="proj_desc" type="text" name="proj_desc" />
+			  </div>
+
+
+	
+
+
+            
+         
+          </div>
+                </fieldset>
+        <div class="btn-block">
+          <button type="submit" href="/">Submit</button>
+        </div>
+      </form>
+	  {% elif data.page == 'edit-user'%}
+	  
+	  <form action="/admin/user-update" method="POST">
+
+        <br/>
+        <fieldset>
+          <legend>Edit User Information</legend>
+           <div class="colums">
+			  <div class="item">
+				<label for="user_name"> Name<span>*</span></label>
+				<input id="user_name" type="text" name="user_name" value={{ data.user.name }} />
+			  </div>
+			  <div class="item">
+				<label for="user_email"> Email<span>*</span></label>
+				<input id="user_email" type="text" name="user_email" value={{ data.user.email}} />
+			  </div>
+				<input id="user_id" type="hidden" name="user_id" value={{ data.user.id}} />
+
+				<div class="item">
+				<label for="user_role">Role<span>*</span></label>
+				<select name="user_role" id="user_role" style="width:38rem; height:2rem" >
+				{% if data.user.role == 'User' %}
+				  <option selected="selected" value="User">User</option>
+				{% else %}
+					<option selected="selected" value="User">User</option>
+				{% endif %}
+				{% if data.user.role == 'Developer' %}
+				  <option selected="selected" value="Developer">Developer</option>
+				  {% else %}
+				  <option value="Developer">Developer</option>
+				  {% endif %}
+				  {% if data.user.role == 'Project Manager' %}
+				  <option  selected="selected" value="Project Manager">Project Manager</option>
+				  {% else %}
+				  <option value="Project Manager">Project Manager</option>
+				  {% endif %}
+				</select>
+				</div>
+
+
+            
+         
+          </div>
+                </fieldset>
+        <div class="btn-block">
+          <button type="submit" href="/">Submit</button>
+        </div>
+      </form>
+		{% endif %}
+    </div>
+
+  </body>
+</html>

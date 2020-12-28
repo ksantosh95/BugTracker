@@ -172,7 +172,7 @@ def get_project_chart(project_id):
     userinfo = session.get('profile')
     user_id = userinfo['user_id']
     mth_id = datetime.now().month
-    year = datetime.now().year
+    yr = datetime.now().year
 
     if project_id==0:
         query = text(""" SELECT mapid.mth_name          AS mth_name, 
@@ -182,7 +182,7 @@ def get_project_chart(project_id):
                                         config.mth_id, 
 										config.year,
                                         proj.p_id 
-                                    FROM   (select * from month_config where id <= (select id from month_config where mth_id = """+str(mth_id)+ """ and year= """ +str(year)+""") and id >= (select id - 11 from month_config where mth_id = """+str(mth_id)+ """ and year= """ +str(year)+""")) config 
+                                    FROM   (select * from month_config where id <= (select id from month_config where mth_id = """+str(mth_id)+ """ and year= """ +str(yr)+""") and id >= (select id - 11 from month_config where mth_id = """+str(mth_id)+ """ and year= """ +str(yr)+""")) config 
                                         CROSS JOIN (SELECT p_id 
                                                     FROM   map_user_proj 
                                                     WHERE  user_id = """ +str(user_id)+"""
@@ -231,7 +231,7 @@ def get_project_chart(project_id):
                                         config.mth_id, 
 										config.year,
                                         proj.p_id 
-                                    FROM   (select * from month_config where id <= (select id from month_config where mth_id = """+str(mth_id)+ """ and year= """ +str(year)+""") and id >= (select id - 11 from month_config where mth_id = """+str(mth_id)+ """ and year= """ +str(year)+""")) config 
+                                    FROM   (select * from month_config where id <= (select id from month_config where mth_id = """+str(mth_id)+ """ and year= """ +str(yr)+""") and id >= (select id - 11 from month_config where mth_id = """+str(mth_id)+ """ and year= """ +str(yr)+""")) config 
                                         CROSS JOIN (SELECT """ +str(project_id)+""" as p_id) proj) mapid 
                                 LEFT OUTER JOIN (SELECT Count(filter.t_id)              AS cnt, 
                                                         filter.p_id, 
@@ -375,7 +375,7 @@ def get_manager_mainpage_piechart(project_id):
     manager_email = userinfo['email']
     user_id = userinfo['user_id']
     mth_id = str(datetime.now().month)
-    year = str(datetime.now().year)
+    yr = str(datetime.now().year)
     if project_id == 0:
         query = text(""" SELECT index.left_pri   AS priority,
                             COALESCE(cnt, 0) AS cnt 
@@ -404,12 +404,12 @@ def get_manager_mainpage_piechart(project_id):
                                                                 WHERE  id <= (SELECT id 
                                                                                 FROM   month_config 
                                                                                 WHERE  mth_id = """+mth_id+""" 
-                                                                                        AND year = """+year+""") 
+                                                                                        AND year = """+yr+""") 
                                                                         AND id >= (SELECT id - 11 
                                                                                     FROM   month_config 
                                                                                     WHERE 
                                                                             mth_id = """+mth_id+""" 
-                                                                            AND year = """+year+""")) 
+                                                                            AND year = """+yr+""")) 
                                                                 config 
                                                             ON Date_part('month', filter.date) = 
                                                                 config.mth_id 
@@ -444,12 +444,12 @@ def get_manager_mainpage_piechart(project_id):
                                                                 WHERE  id <= (SELECT id 
                                                                                 FROM   month_config 
                                                                                 WHERE  mth_id = """+mth_id+""" 
-                                                                                        AND year = """+year+""") 
+                                                                                        AND year = """+yr+""") 
                                                                         AND id >= (SELECT id - 11 
                                                                                     FROM   month_config 
                                                                                     WHERE 
                                                                             mth_id = """+mth_id+""" 
-                                                                            AND year = """+year+""")) 
+                                                                            AND year = """+yr+""")) 
                                                                 config 
                                                             ON Date_part('month', filter.date) = 
                                                                 config.mth_id 

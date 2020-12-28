@@ -6,7 +6,7 @@ class Month_config(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     mth_id = db.Column(db.Integer)
     mth_name = db.Column(db.String(40))
-    year = db.Column(db.String(40))
+    year = db.Column(db.Integer)
 
 
     def __init__(self, mth_id, mth_name, year):

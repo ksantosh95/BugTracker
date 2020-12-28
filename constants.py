@@ -7,3 +7,4 @@ AUTH0_CLIENT_SECRET = 'KRIcQ3mcZ8YYAoAKObkRkV4QQrvKahUoe5VfnTWMKKHXFsN5SXmEIiOPS
 AUTH0_AUDIENCE = 'bugTrac'
 STATUS = ['Open','Progress','Closed']
 PRIORITY = ['High','Medium','Low']
+CURRENT_DATE = '13/02/2020'

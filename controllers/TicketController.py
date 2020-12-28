@@ -19,8 +19,8 @@ from flask import Flask, jsonify, request, abort, render_template, redirect, url
 from app import app, db
 import os, sys
 from datetime import date
-from sqlalchemy import text
-
+from sqlalchemy import text, func
+import constants
 from models.TicketModel import Ticket
 from models.ProjectModel import Project
 from models.Ticket_HistoryModel import Ticket_history
@@ -49,11 +49,12 @@ from controllers import ManagerController
 @app.route("/createticket")
 def create_ticket():
     userinfo = session.get('profile')
-    project_name_list = Project.query.all()
-    project_name_list_json = [Project.json_format(row) for row in project_name_list]
+    project_name_list = Project.query.join(Map_user_proj, Project.p_id == Map_user_proj.p_id)\
+                        .add_columns(Project.p_id.label('id'), Project.p_name.label('name'))\
+                        .filter(Map_user_proj.user_id == userinfo['user_id'])
     
     data = {
-        "project" : project_name_list_json,
+        "project" : project_name_list,
         "userinfo" : userinfo,
         "role" : userinfo['role'],
         "username" : userinfo['nickname']
@@ -73,10 +74,16 @@ def submit_ticket():
     t_status = "Open"
     t_type = request.form.get('t_type')
     today = date.today()
-    t_create_date = today.strftime("%d/%m/%Y")
-    t_close_date = "N/A"
-   
-    ticket_entry = Ticket(t_title,t_desc,user_id,submitter_email,p_id,t_priority,t_status,t_type,t_create_date,t_close_date)
+    #t_create_date = today.strftime("%d/%m/%Y")
+    t_create_date = constants.CURRENT_DATE
+    t_close_date = ""
+    
+    t_id = db.session.query(func.max(Ticket.t_id)).all()
+    if t_id[0][0] == None:
+        ticket_entry = Ticket(1,t_title,t_desc,user_id,submitter_email,p_id,t_priority,t_status,t_type,t_create_date,t_close_date)
+    else:
+        ticket_entry = Ticket(t_id[0][0] + 1, t_title,t_desc,user_id,submitter_email,p_id,t_priority,t_status,t_type,t_create_date,t_close_date)
+    
     try:
         ticket_entry.insert()
     except:
@@ -85,7 +92,13 @@ def submit_ticket():
     
     #ENTER IN TICKET HISTORY
     ticket_id = ticket_entry.t_id
-    ticket_history_entry = Ticket_history(ticket_id,user_id,t_status,t_create_date,t_priority)
+    t_history_id = db.session.query(func.max(Ticket_history.t_history_id)).all()
+    if t_history_id[0][0] == None:
+        ticket_history_entry = Ticket_history(1,ticket_id,user_id,t_status,t_create_date,t_priority)
+    else:
+        ticket_history_entry = Ticket_history(t_history_id[0][0]+1,ticket_id,user_id,t_status,t_create_date,t_priority)
+        
+    
     try:
         ticket_history_entry.insert()
     except:
@@ -156,7 +169,8 @@ def get_ticket_details(ticket_id):
 
     comment_list = Comment.query.join(Users, Comment.user_id==Users.user_id)\
                 .add_columns(Comment.t_id, Comment.comment, Comment.date, Users.user_name.label('user_id'))\
-                .filter(Comment.t_id==ticket_id).all()
+                .filter(Comment.t_id==ticket_id)\
+                .order_by(Comment.c_id.desc()).all()
     comment = [Comment.json_format(row) for row in comment_list]
 
     #Get list of developers in the project for assigning
@@ -220,8 +234,14 @@ def assign_dev():
     #Insert record in ticket history
     user_id = request.form.get('dev_name')
     today = date.today()
-    t_update_date = today.strftime("%d/%m/%Y")
-    ticket_history = Ticket_history(ticket_id, user_id, ticket.t_status, t_update_date, ticket.t_priority )
+    #t_update_date = today.strftime("%d/%m/%Y")
+    t_update_date =constants.CURRENT_DATE
+    t_history_id = db.session.query(func.max(Ticket_history.t_history_id)).all()
+    if t_history_id[0][0] == None:
+        ticket_history = Ticket_history(1, ticket_id, user_id, ticket.t_status, t_update_date, ticket.t_priority )
+    else:
+        ticket_history = Ticket_history(t_history_id[0][0]+1,ticket_id, user_id, ticket.t_status, t_update_date, ticket.t_priority )
+    
     try:
         ticket_history.insert()
     except:
@@ -231,7 +251,11 @@ def assign_dev():
     #Insert record in comments
     userinfo = session.get('profile')
     assigned_user_name = Users.query.with_entities(Users.user_name).filter(Users.user_id == user_id).one()
-    comment = Comment(ticket_id, userinfo['user_id'],t_update_date, " assigned developer " + assigned_user_name[0] )
+    c_id = db.session.query(func.max(Comment.c_id)).all()
+    if c_id[0][0] == None:
+        comment = Comment(1,ticket_id, userinfo['user_id'],t_update_date, " assigned developer " + assigned_user_name[0] )
+    else:
+        comment = Comment(c_id[0][0]+1,ticket_id, userinfo['user_id'],t_update_date, " assigned developer " + assigned_user_name[0] )
     try:
         comment.insert()
     except:
@@ -267,8 +291,8 @@ def update_ticket():
     t_status = request.form.get('t_status')
     t_type = request.form.get('t_type')
     today = date.today()
-    t_update_date = today.strftime("%d/%m/%Y")
-
+    #t_update_date = today.strftime("%d/%m/%Y")
+    t_update_date = constants.CURRENT_DATE
 
     ticket_entry = Ticket.query.get(ticket_id)
     #CHECK IF TICKET HISTORY NEEDS TO BE UPDATED
@@ -294,7 +318,12 @@ def update_ticket():
     #ENTER IN TICKET HISTORY
     if to_update_ticket_history:
         ticket_id = ticket_entry.t_id
-        ticket_history_entry = Ticket_history(ticket_id,ticket_entry.assigned_user_id,t_status,t_update_date,t_priority)
+        t_history_id = db.session.query(func.max(Ticket_history.t_history_id)).all()
+        if t_history_id[0][0] == None:
+            ticket_history_entry = Ticket_history(1,ticket_id,ticket_entry.assigned_user_id,t_status,t_update_date,t_priority)
+        else:
+            ticket_history_entry = Ticket_history(t_history_id[0][0]+1,ticket_id,ticket_entry.assigned_user_id,t_status,t_update_date,t_priority)
+        
         try:
             ticket_history_entry.insert()
         except:
@@ -333,7 +362,8 @@ def update_project_status():
     ticket_id = request.form.get('ticket_id')
     ticket_entry = Ticket.query.get(ticket_id)
     today = date.today()
-    t_update_date = today.strftime("%d/%m/%Y")
+    #t_update_date = today.strftime("%d/%m/%Y")
+    t_update_date = constants.CURRENT_DATE
     t_status = request.form.get('input')
     p_name = request.form.get('p_name')
     
@@ -349,7 +379,13 @@ def update_project_status():
 
     #ENTER IN TICKET HISTORY
     ticket_id = ticket_entry.t_id
-    ticket_history_entry = Ticket_history(ticket_id,ticket_entry.assigned_user_id,t_status,t_update_date,ticket_entry.t_priority)
+    t_history_id = db.session.query(func.max(Ticket_history.t_history_id)).all()
+    if t_history_id[0][0] == None:
+        ticket_history_entry = Ticket_history(1,ticket_id,ticket_entry.assigned_user_id,t_status,t_update_date,ticket_entry.t_priority)
+    else:
+        ticket_history_entry = Ticket_history(t_history_id[0][0]+1,ticket_id,ticket_entry.assigned_user_id,t_status,t_update_date,ticket_entry.t_priority)
+        
+    
     try:
         ticket_history_entry.insert()
     except:
@@ -368,7 +404,12 @@ def update_project_status():
             abort(500)
 
     #Insert record in comments
-    comment = Comment(ticket_id, userinfo['user_id'],t_update_date, " Updated ticket status to  " + t_status )
+    c_id = db.session.query(func.max(Comment.c_id)).all()
+    if c_id[0][0] == None:
+        comment = Comment(1,ticket_id, userinfo['user_id'],t_update_date, " Updated ticket status to  " + t_status )
+    else:
+        comment = Comment(c_id[0][0]+1,ticket_id, userinfo['user_id'],t_update_date, " Updated ticket status to  " + t_status )
+    
     try:
         comment.insert()
     except:

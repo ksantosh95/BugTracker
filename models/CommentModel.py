@@ -11,7 +11,8 @@ class Comment(db.Model):
 
 
 
-    def __init__(self, t_id, user_id, date, comment):
+    def __init__(self,c_id, t_id, user_id, date, comment):
+        self.c_id = c_id
         self.t_id = t_id
         self.user_id = user_id
         self.date = date

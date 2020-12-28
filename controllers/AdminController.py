@@ -26,7 +26,7 @@ from flask import Flask, jsonify, request, abort, render_template, redirect, url
 from app import app, db
 import os, sys
 from datetime import date
-from sqlalchemy import text
+from sqlalchemy import text, func
 from datetime import datetime
 import constants
 from models.TicketModel import Ticket
@@ -87,9 +87,14 @@ def submit_user():
     project_id = request.form.get('project')
     user_pwd = "bugTracker123"
     today = date.today()
-    update_date = today.strftime("%d/%m/%Y")
-   
-    user_entry = Users(user_name, user_email,user_pwd, user_role, update_date)
+    #update_date = today.strftime("%d/%m/%Y")
+    update_date= constants.CURRENT_DATE
+
+    user_id = db.session.query(func.max(Users.user_id)).all()
+    if user_id[0][0] == None:
+        user_entry = Users(1, user_name, user_email,user_pwd, user_role, update_date)
+    else:
+        user_entry = Users(user_id[0][0] + 1, user_name, user_email,user_pwd, user_role, update_date)
     try:
         user_entry.insert()
     except:
@@ -144,7 +149,8 @@ def update_user():
     user.user_name = request.form.get('user_name')
     user.user_role = request.form.get('user_role')
     today = date.today()
-    update_date = today.strftime("%d/%m/%Y")
+    #update_date = today.strftime("%d/%m/%Y")
+    update_date =constants.CURRENT_DATE
     user.update_date = update_date
     user.update()
     return redirect("/admin/user-list")
@@ -174,14 +180,21 @@ def get_user_history(user_id):
 
     project_name_list = Project.query.all()
     project_name_list_json = [Project.json_format(row) for row in project_name_list]
-
+    ticket_list =""
     user_role = user['role']
     user_email = user['email']
+    #For developer, get list of assigned tickets
     if user_role == "Developer":
         ticket_list = Ticket.query.join(Project, Ticket.p_id == Project.p_id)\
                         .add_columns(Ticket.t_id, Ticket.t_title, Ticket.t_status,Project.p_name)\
                             .filter(Ticket.assigned_user_id == user_id)
+    #For user, get list of submitted tickets
     elif user_role == "User":
+        ticket_list = Ticket.query.join(Project, Ticket.p_id == Project.p_id)\
+                        .add_columns(Ticket.t_id, Ticket.t_title, Ticket.t_status, Project.p_name)\
+                            .filter(Ticket.submitter_email == user_email)
+    #For manager, get list of submitted tickets
+    elif user_role == "Manager":
         ticket_list = Ticket.query.join(Project, Ticket.p_id == Project.p_id)\
                         .add_columns(Ticket.t_id, Ticket.t_title, Ticket.t_status, Project.p_name)\
                             .filter(Ticket.submitter_email == user_email)
@@ -220,8 +233,8 @@ def assign_user_to_project():
     role = request.form.get('role')
     page = request.form.get('page')
     today = date.today()
-    update_date = today.strftime("%d/%m/%Y")
-
+    #update_date = today.strftime("%d/%m/%Y")
+    update_date = constants.CURRENT_DATE
     if input_type == "Add":
         map_entry = Map_user_proj (user_id, project_id, role,update_date, "" )
         try:
@@ -269,14 +282,29 @@ def delete_project_user_projectdetails():
 @app.route('/admin/projects', methods=['GET'])
 def admin_get_projects():
     userinfo = session.get('profile')
-    project_list = Project.query.all()
-    project = [Project.json_format(proj) for proj in project_list]  
+
+    query_for_project  = text(""" SELECT proj.p_id         AS p_id, 
+                                    proj.p_name       AS p_name, 
+                                    proj.p_desc       AS p_desc, 
+                                    proj.p_start_date AS p_start_date, 
+                                    man.user_name     AS manager_name 
+                                FROM   project proj 
+                                    LEFT OUTER JOIN (SELECT map.p_id, 
+                                                            u.user_name 
+                                                        FROM   map_user_proj map 
+                                                            INNER JOIN users u 
+                                                                    ON map.user_id = u.user_id 
+                                                        WHERE  map.user_role = 'Project Manager')man 
+                                                    ON proj.p_id = man.p_id """)
+    result = db.session.execute(query_for_project)
+    project= [Project.project_manager_json(row) for row in result]
+    print(project)
     data = {
         "project" : project,
         "role" : userinfo['role'],
         "username" : userinfo['nickname'],
         "page" : "projects",
-        "userinfo" : userinfo
+        "userinfo" : userinfo,
     }
     return render_template('admin-mainpage.html', data = data)
 
@@ -288,8 +316,12 @@ def admin_get_projects():
 @app.route('/admin/tickets', methods=['GET'])
 def admin_get_tickets():
     userinfo = session.get('profile')
-    ticket_value = Ticket.query.all()
-    ticket_value = [t.json_format() for t in ticket_value]
+    ticket_value = Ticket.query.join(Project, Ticket.p_id == Project.p_id)\
+                    .add_columns(Ticket.t_id.label('id'),Ticket.t_title.label('title'), Ticket.t_desc.label('desc'), \
+                        Ticket.assigned_user_id.label('user_id'), Project.p_name.label('p_id')\
+                        ,Ticket.t_priority.label('priority'), Ticket.t_status.label('status'),Ticket.t_type.label('type')\
+                            ,Ticket.t_create_date.label('create_date'), Ticket.t_close_date.label('close_date')).all()
+
     data = {
         "ticket" : ticket_value,
         "role" : userinfo['role'],
@@ -340,3 +372,47 @@ def get_ticket_info(ticket_id):
         "status_array":status_array
     }
     return render_template('ticketform.html', data = data)
+
+
+############################################# 2 #################################################
+#   PROJECT CREATION   :   Create a new user                                                       #
+#################################################################################################
+@app.route("/admin/create-project")
+def create_project():
+    userinfo = session.get('profile')  
+
+    data = {
+        "userinfo" : userinfo,
+        "role" : userinfo['role'],
+        "username" : userinfo['nickname'],
+        "page": "create-project"
+    }
+    return render_template('projectform.html', data = data)
+
+############################################# 3 #################################################
+#   SUBMIT PROJECT :   Submit PROJECT information                                               #
+#   Algorithm   :   1.  Read input values from the form                                         #
+#                   2.  Update user info in the USER table                                      #
+#                   3.  Update project and user role in the User-Project mapping table          #
+#   Routing     :   Admin submits form ->   User created    ->  Admin user list page            #
+#################################################################################################
+@app.route("/admin/project-submit", methods=['POST'])
+def submit_project():
+    proj_name = request.form.get('proj_name')
+    proj_desc = request.form.get('proj_desc')
+    today = date.today()
+    #p_create_date = today.strftime("%d/%m/%Y")
+    p_create_date = constants.CURRENT_DATE
+    p_id = db.session.query(func.max(Project.p_id)).all()
+    if p_id[0][0] == None:
+        proj_entry = Project(1, proj_name, proj_desc, p_create_date, "")
+    else:
+        proj_entry = Project(p_id[0][0] + 1, proj_name, proj_desc, p_create_date, "")
+    try:
+        proj_entry.insert()
+    except:
+        print(sys.exc_info())
+        abort(500)
+
+
+    return redirect("/admin/projects")

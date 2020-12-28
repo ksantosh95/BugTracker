@@ -6,7 +6,7 @@ class Map_user_proj(db.Model):
     map_id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer)
     p_id = db.Column(db.Integer)
-    user_role = db.Column(db.String(20))
+    user_role = db.Column(db.String)
     user_assign_date = db.Column(db.String(20))
     user_end_date = db.Column(db.String(20))
 
