@@ -1,7 +1,7 @@
 <br />
 <p align="center">
-  <a href="#">
-    Bug Tracker - In Progress
+  <a href="https://bugtracker-stage.herokuapp.com/">
+    Bug Tracker
   </a>
 
 
