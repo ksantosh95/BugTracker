@@ -37,6 +37,11 @@ from models.UsersModel import Users
 from controllers import NotificationController
 
 
+def is_valid_remove(user_id):
+    if int(user_id) <= constants.DEMO_ADMIN_ID:
+        return False
+    return True
+
 ############################################# 1 #################################################
 #   USER MANAGEMENT :   Get list of all user accounts                                           #
 ################################################################################################# 
@@ -167,6 +172,9 @@ def update_user():
 #################################################################################################
 @app.route("/admin/delete-user/<int:user_id>")
 def delete_user(user_id):
+    userinfo = session.get('profile')
+    if user_id < 20 and userinfo['user_id'] == constants.DEMO_ADMIN_ID:
+        abort(403)
     user = Users.query.get(user_id)
     try:
         user.delete()
@@ -174,6 +182,9 @@ def delete_user(user_id):
         print(sys.exc_info())
         abort(500)
     return redirect("/admin/user-list")
+
+
+
 
 @app.route("/admin/userdetails/<int:user_id>")
 def get_user_history(user_id):
@@ -186,8 +197,14 @@ def get_user_history(user_id):
                     .add_columns(Project.p_id, Project.p_name)\
                         .filter(Map_user_proj.user_id == user_id)
 
-    project_name_list = Project.query.all()
-    project_name_list_json = [Project.json_format(row) for row in project_name_list]
+
+    sql = text("""select p_id,p_name,p_desc,p_start_date, p_end_date from project where p_id
+                 not in (select p_id from map_user_proj where user_id ="""+str(user_id)+""")""")
+    result = db.session.execute(sql)
+    project_name_list = [row for row in result]
+    project_name_list_json = [Project.json_format(p) for p in project_name_list]  
+
+
     ticket_list =""
     user_role = user['role']
     user_email = user['email']
@@ -206,6 +223,8 @@ def get_user_history(user_id):
         ticket_list = Ticket.query.join(Project, Ticket.p_id == Project.p_id)\
                         .add_columns(Ticket.t_id, Ticket.t_title, Ticket.t_status, Project.p_name)\
                             .filter(Ticket.submitter_email == user_email)
+    
+    delete_is_valid = is_valid_remove(user_id)
 
     data = {
         "project" : project_name_list_json,
@@ -215,7 +234,8 @@ def get_user_history(user_id):
         "username" : userinfo['nickname'],
         "user" : [user],
         "page": "user-details",
-        "ticket": ticket_list
+        "ticket": ticket_list,
+        "is_valid_remove":delete_is_valid
     }
     return render_template('user_details.html', data = data)
 
@@ -270,7 +290,13 @@ def delete_project_user():
     userinfo = session.get('profile')
     if userinfo['role']!= 'Admin':
         abort(401)
+
+    
     user_id = request.args.get('user_id')
+
+    delete_is_valid = is_valid_remove(user_id)
+    if not delete_is_valid:
+        abort(403)
     project_id = request.args.get('project_id')
     map= Map_user_proj.query.filter(Map_user_proj.user_id == user_id).filter(Map_user_proj.p_id == project_id).one()
     map.delete()
@@ -285,7 +311,13 @@ def delete_project_user_projectdetails():
     userinfo = session.get('profile')
     if userinfo['role']!= 'Admin':
         abort(401)
+
+  
     user_id = request.args.get('user_id')
+
+    delete_is_valid = is_valid_remove(user_id)
+    if not delete_is_valid:
+        abort(403)
     project_id = request.args.get('project_id')
     map= Map_user_proj.query.filter(Map_user_proj.user_id == user_id).filter(Map_user_proj.p_id == project_id).one()
     map.delete()
@@ -300,21 +332,8 @@ def admin_get_projects():
     userinfo = session.get('profile')
     if userinfo['role']!= 'Admin':
         abort(401)
-    query_for_project  = text(""" SELECT proj.p_id         AS p_id, 
-                                    proj.p_name       AS p_name, 
-                                    proj.p_desc       AS p_desc, 
-                                    proj.p_start_date AS p_start_date, 
-                                    man.user_name     AS manager_name 
-                                FROM   project proj 
-                                    LEFT OUTER JOIN (SELECT map.p_id, 
-                                                            u.user_name 
-                                                        FROM   map_user_proj map 
-                                                            INNER JOIN users u 
-                                                                    ON map.user_id = u.user_id 
-                                                        WHERE  map.user_role = 'Project Manager')man 
-                                                    ON proj.p_id = man.p_id """)
-    result = db.session.execute(query_for_project)
-    project= [Project.project_manager_json(row) for row in result]
+    project_list = Project.query.all()
+    project= [Project.json_format(row) for row in project_list]
     print(project)
     data = {
         "project" : project,

@@ -1,0 +1,975 @@
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 10.13
+-- Dumped by pg_dump version 10.13
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+--
+-- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: 
+--
+
+CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
+
+
+--
+-- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: 
+--
+
+COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
+
+
+SET default_tablespace = '';
+
+SET default_with_oids = false;
+
+--
+-- Name: alembic_version; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.alembic_version (
+    version_num character varying(32) NOT NULL
+);
+
+
+ALTER TABLE public.alembic_version OWNER TO postgres;
+
+--
+-- Name: comment; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.comment (
+    c_id integer NOT NULL,
+    t_id integer,
+    user_id integer,
+    date character varying(20),
+    comment character varying
+);
+
+
+ALTER TABLE public.comment OWNER TO postgres;
+
+--
+-- Name: comment_c_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.comment_c_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.comment_c_id_seq OWNER TO postgres;
+
+--
+-- Name: comment_c_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.comment_c_id_seq OWNED BY public.comment.c_id;
+
+
+--
+-- Name: map_user_proj; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.map_user_proj (
+    map_id integer NOT NULL,
+    user_id integer,
+    p_id integer,
+    user_role character varying,
+    user_assign_date character varying(20),
+    user_end_date character varying(20)
+);
+
+
+ALTER TABLE public.map_user_proj OWNER TO postgres;
+
+--
+-- Name: map_user_proj_map_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.map_user_proj_map_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.map_user_proj_map_id_seq OWNER TO postgres;
+
+--
+-- Name: map_user_proj_map_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.map_user_proj_map_id_seq OWNED BY public.map_user_proj.map_id;
+
+
+--
+-- Name: month_config; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.month_config (
+    id integer NOT NULL,
+    mth_id integer,
+    mth_name character varying(40),
+    year integer
+);
+
+
+ALTER TABLE public.month_config OWNER TO postgres;
+
+--
+-- Name: month_config_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.month_config_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.month_config_id_seq OWNER TO postgres;
+
+--
+-- Name: month_config_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.month_config_id_seq OWNED BY public.month_config.id;
+
+
+--
+-- Name: notification; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.notification (
+    n_id integer NOT NULL,
+    t_id integer,
+    user_id integer,
+    n_type character varying
+);
+
+
+ALTER TABLE public.notification OWNER TO postgres;
+
+--
+-- Name: notification_n_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.notification_n_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.notification_n_id_seq OWNER TO postgres;
+
+--
+-- Name: notification_n_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.notification_n_id_seq OWNED BY public.notification.n_id;
+
+
+--
+-- Name: project; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.project (
+    p_id integer NOT NULL,
+    p_name character varying,
+    p_desc character varying,
+    p_start_date character varying(20),
+    p_end_date character varying(20)
+);
+
+
+ALTER TABLE public.project OWNER TO postgres;
+
+--
+-- Name: project_p_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.project_p_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.project_p_id_seq OWNER TO postgres;
+
+--
+-- Name: project_p_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.project_p_id_seq OWNED BY public.project.p_id;
+
+
+--
+-- Name: ticket; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.ticket (
+    t_id integer NOT NULL,
+    t_title character varying,
+    t_desc character varying,
+    assigned_user_id integer,
+    submitter_email character varying,
+    p_id integer,
+    t_priority character varying(40),
+    t_status character varying(40),
+    t_type character varying(40),
+    t_create_date character varying(40),
+    t_close_date character varying(40)
+);
+
+
+ALTER TABLE public.ticket OWNER TO postgres;
+
+--
+-- Name: ticket_history; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.ticket_history (
+    t_history_id integer NOT NULL,
+    t_id integer,
+    user_id integer,
+    t_status character varying(20),
+    t_update_date character varying(20),
+    t_priority character varying(20)
+);
+
+
+ALTER TABLE public.ticket_history OWNER TO postgres;
+
+--
+-- Name: ticket_history_t_history_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.ticket_history_t_history_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.ticket_history_t_history_id_seq OWNER TO postgres;
+
+--
+-- Name: ticket_history_t_history_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.ticket_history_t_history_id_seq OWNED BY public.ticket_history.t_history_id;
+
+
+--
+-- Name: ticket_t_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.ticket_t_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.ticket_t_id_seq OWNER TO postgres;
+
+--
+-- Name: ticket_t_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.ticket_t_id_seq OWNED BY public.ticket.t_id;
+
+
+--
+-- Name: users; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.users (
+    user_id integer NOT NULL,
+    user_name character varying(40),
+    user_email character varying(40),
+    user_pwd character varying(100),
+    user_role character varying(20),
+    update_date character varying(40)
+);
+
+
+ALTER TABLE public.users OWNER TO postgres;
+
+--
+-- Name: users_user_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.users_user_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.users_user_id_seq OWNER TO postgres;
+
+--
+-- Name: users_user_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.users_user_id_seq OWNED BY public.users.user_id;
+
+
+--
+-- Name: comment c_id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.comment ALTER COLUMN c_id SET DEFAULT nextval('public.comment_c_id_seq'::regclass);
+
+
+--
+-- Name: map_user_proj map_id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.map_user_proj ALTER COLUMN map_id SET DEFAULT nextval('public.map_user_proj_map_id_seq'::regclass);
+
+
+--
+-- Name: month_config id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.month_config ALTER COLUMN id SET DEFAULT nextval('public.month_config_id_seq'::regclass);
+
+
+--
+-- Name: notification n_id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.notification ALTER COLUMN n_id SET DEFAULT nextval('public.notification_n_id_seq'::regclass);
+
+
+--
+-- Name: project p_id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.project ALTER COLUMN p_id SET DEFAULT nextval('public.project_p_id_seq'::regclass);
+
+
+--
+-- Name: ticket t_id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.ticket ALTER COLUMN t_id SET DEFAULT nextval('public.ticket_t_id_seq'::regclass);
+
+
+--
+-- Name: ticket_history t_history_id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.ticket_history ALTER COLUMN t_history_id SET DEFAULT nextval('public.ticket_history_t_history_id_seq'::regclass);
+
+
+--
+-- Name: users user_id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.users ALTER COLUMN user_id SET DEFAULT nextval('public.users_user_id_seq'::regclass);
+
+
+--
+-- Data for Name: alembic_version; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.alembic_version (version_num) FROM stdin;
+09eae0917ce0
+\.
+
+
+--
+-- Data for Name: comment; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.comment (c_id, t_id, user_id, date, comment) FROM stdin;
+1	1	4	07/02/2020	 assigned developer dev_1
+2	1	11	09/02/2020	 Updated ticket status to  Progress
+3	1	3	11/02/2020	Check out stack overflow on JS graph displays
+4	1	11	13/02/2020	 Updated ticket status to  Closed
+5	2	3	14/02/2020	assigned developer dev_1
+6	2	11	18/02/2020	Updated ticket status to  Progress
+7	2	11	22/02/2020	Updated ticket status to  Closed
+8	3	3	14/02/2020	assigned developer dev_1
+9	3	11	18/02/2020	Updated ticket status to  Progress
+10	3	11	22/02/2020	Updated ticket status to  Closed
+11	4	3	14/02/2020	assigned developer dev_1
+12	4	11	18/02/2020	Updated ticket status to  Progress
+13	4	11	22/02/2020	Updated ticket status to  Closed
+14	5	3	14/02/2020	assigned developer dev_1
+15	5	11	18/02/2020	Updated ticket status to  Progress
+16	5	11	22/02/2020	Updated ticket status to  Closed
+17	6	3	14/03/2020	assigned developer dev_1
+18	6	11	18/03/2020	Updated ticket status to  Progress
+19	6	11	22/03/2020	Updated ticket status to  Closed
+20	7	3	14/03/2020	assigned developer dev_1
+21	7	11	18/03/2020	Updated ticket status to  Progress
+22	7	11	22/03/2020	Updated ticket status to  Closed
+23	8	3	14/03/2020	assigned developer dev_1
+24	8	11	18/03/2020	Updated ticket status to  Progress
+25	8	11	22/03/2020	Updated ticket status to  Closed
+26	9	3	14/03/2020	assigned developer Bryan
+27	9	12	18/03/2020	Updated ticket status to  Progress
+28	9	12	22/03/2020	Updated ticket status to  Closed
+29	10	11	14/04/2020	assigned developer Bryan
+30	10	12	18/04/2020	Updated ticket status to  Progress
+31	10	12	22/04/2020	Updated ticket status to  Closed
+32	11	11	14/04/2020	assigned developer Bryan
+33	11	12	18/04/2020	Updated ticket status to  Progress
+34	11	12	22/04/2020	Updated ticket status to  Closed
+35	12	3	13/09/2020	assigned developer Alice
+36	12	5	16/09/2020	Updated ticket status to  Progress
+37	12	5	19/09/2020	Updated ticket status to  Closed
+38	13	3	13/09/2020	assigned developer Alice
+39	13	5	16/09/2020	Updated ticket status to  Progress
+40	13	5	19/09/2020	Updated ticket status to  Closed
+41	14	3	13/010/2020	assigned developer Alice
+42	14	5	16/010/2020	Updated ticket status to  Progress
+43	14	5	19/010/2020	Updated ticket status to  Closed
+44	15	3	13/011/2020	assigned developer Noa
+45	15	16	16/011/2020	Updated ticket status to  Progress
+46	15	16	19/011/2020	Updated ticket status to  Closed
+47	16	3	13/011/2020	assigned developer Noa
+48	16	16	16/011/2020	Updated ticket status to  Progress
+49	16	16	19/011/2020	Updated ticket status to  Closed
+50	17	3	13/011/2020	assigned developer Noa
+51	17	16	16/011/2020	Updated ticket status to  Progress
+52	17	16	19/011/2020	Updated ticket status to  Closed
+53	18	3	25/011/2020	assigned developer Alice
+54	18	5	27/011/2020	Updated ticket status to  Progress
+55	18	5	29/011/2020	Updated ticket status to  Closed
+56	19	3	6/12/2020	assigned developer Alice
+57	19	5	8/12/2020	Updated ticket status to  Progress
+58	19	5	10/12/2020	Updated ticket status to  Closed
+59	20	3	6/12/2020	assigned developer Demo_Developer
+60	20	4	8/12/2020	Updated ticket status to  Progress
+61	20	4	10/12/2020	Updated ticket status to  Closed
+62	21	3	6/12/2020	assigned developer Alice
+63	21	5	8/12/2020	Updated ticket status to  Progress
+64	21	5	10/12/2020	Updated ticket status to  Closed
+65	22	3	19/12/2020	assigned developer Alice
+66	22	5	23/12/2020	Updated ticket status to  Progress
+67	22	5	27/12/2020	Updated ticket status to  Closed
+68	4	3	13/02/2020	Functionality fixed
+69	23	4	23/04/2020	Updated ticket status to  Progress
+70	23	4	27/04/2020	Updated ticket status to  Closed
+71	24	3	19/04/2020	assigned developer Demo_Developer
+72	24	4	23/04/2020	Updated ticket status to  Progress
+73	24	4	27/04/2020	Updated ticket status to  Closed
+74	25	3	19/05/2020	assigned developer Demo_Developer
+75	25	4	23/05/2020	Updated ticket status to  Progress
+77	26	3	19/05/2020	assigned developer Demo_Developer
+78	26	4	23/05/2020	Updated ticket status to  Progress
+80	27	3	19/06/2020	assigned developer Demo_Developer
+81	27	4	23/06/2020	Updated ticket status to  Progress
+83	28	3	19/06/2020	assigned developer Demo_Developer
+84	28	4	23/06/2020	Updated ticket status to  Progress
+86	29	3	19/06/2020	assigned developer Demo_Developer
+89	30	3	19/07/2020	assigned developer Demo_Developer
+92	31	3	19/08/2020	assigned developer Demo_Developer
+95	32	3	19/09/2020	assigned developer Demo_Developer
+\.
+
+
+--
+-- Data for Name: map_user_proj; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.map_user_proj (map_id, user_id, p_id, user_role, user_assign_date, user_end_date) FROM stdin;
+1	2	1	User	27/12/2020	
+2	3	1	Project Manager	27/12/2020	
+3	4	1	Developer	27/12/2020	
+4	5	1	Developer	27/12/2020	
+5	6	1	Developer	27/12/2020	
+6	7	1	User	27/12/2020	
+7	8	3	Developer	27/12/2020	
+8	9	3	Developer	27/12/2020	
+9	10	3	User	27/12/2020	
+10	11	2	Developer	27/12/2020	
+11	12	2	Developer	27/12/2020	
+12	13	2	Developer	27/12/2020	
+13	14	2	User	27/12/2020	
+15	16	4	Developer	27/12/2020	
+17	18	4	User	27/12/2020	
+19	3	4	Project Manager	27/12/2020	
+20	4	2	Developer	27/12/2020	
+21	5	4	Developer	27/12/2020	
+22	6	3	Developer	27/12/2020	
+23	3	2	Project Manager	12/02/2020	
+24	2	5	User	13/02/2020	
+25	3	5	Project Manager	13/02/2020	
+26	4	5	Developer	13/02/2020	
+27	20	5	User	13/02/2020	
+28	21	5	User	13/02/2020	
+29	22	5	Developer	13/02/2020	
+30	23	5	Developer	13/02/2020	
+32	22	1	Developer	13/02/2020	
+33	20	1	User	13/02/2020	
+34	20	2	User	13/02/2020	
+35	23	2	Developer	13/02/2020	
+36	22	3	Developer	13/02/2020	
+37	23	4	Developer	13/02/2020	
+38	15	5	Project Manager	13/02/2020	
+\.
+
+
+--
+-- Data for Name: month_config; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.month_config (id, mth_id, mth_name, year) FROM stdin;
+1	1	Jan`20	2020
+2	2	Feb`20	2020
+3	3	Mar`20	2020
+4	4	Apr`20	2020
+5	5	May`20	2020
+6	6	Jun`20	2020
+7	7	Jul`20	2020
+8	8	Aug`20	2020
+9	9	Sep`20	2020
+10	10	Oct`20	2020
+11	11	Nov`20	2020
+12	12	Dec`20	2020
+13	1	Jan`21	2021
+14	2	Feb`21	2021
+15	3	Mar`21	2021
+16	4	Apr`21	2021
+17	5	May`21	2021
+18	6	Jun`21	2021
+19	7	Jul`21	2021
+20	8	Aug`21	2021
+21	9	Sep`21	2021
+22	10	Oct`21	2021
+23	11	Nov`21	2021
+24	12	Dec`21	2021
+\.
+
+
+--
+-- Data for Name: notification; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.notification (n_id, t_id, user_id, n_type) FROM stdin;
+1	1	11	New
+2	1	12	New
+3	1	13	New
+4	1	14	New
+5	1	15	New
+7	1	11	Assigned
+8	1	11	Update
+9	1	12	Update
+10	1	13	Update
+11	1	14	Update
+12	1	15	Update
+14	1	11	Update
+15	1	12	Update
+16	1	13	Update
+17	1	14	Update
+18	1	15	Update
+20	1	3	Update
+21	1	11	Update
+22	1	12	Update
+23	1	13	Update
+24	1	14	Update
+25	1	4	Update
+26	1	3	Update
+27	1	20	Update
+28	1	23	Update
+29	1	11	Update
+30	1	12	Update
+31	1	13	Update
+32	1	14	Update
+33	1	4	Update
+34	1	3	Update
+35	1	20	Update
+36	1	23	Update
+37	33	2	New
+38	33	3	New
+39	33	4	New
+40	33	20	New
+41	33	21	New
+42	33	22	New
+43	33	23	New
+44	33	15	New
+\.
+
+
+--
+-- Data for Name: project; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.project (p_id, p_name, p_desc, p_start_date, p_end_date) FROM stdin;
+1	Bug Tracker	Efficient bug tracking web application to track bugs in software development projects with role management, assignment and notification features.	23/11/2020	
+2	Data Analytics Web Dashboard	Web application to monitor the inspections carried at various Restaurants in LA. Powerful dashboard consisting of trend charts and metric highlighters built using NodeJS, Oracle, HTML.	01/01/2020	
+3	Handwritten Digit Recognition	Convolutional Neural Network model for processing 300 x 300 hand written digits and accurately classifying them into appropriate classes.	01/01/2020	
+4	Twitter Clone	Implementation of twitter like engine using F# REST APIs and web sockets	01/10/2020	
+5	Demo Project	Test project for demonstrating the app functionality	13/02/2020	
+\.
+
+
+--
+-- Data for Name: ticket; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.ticket (t_id, t_title, t_desc, assigned_user_id, submitter_email, p_id, t_priority, t_status, t_type, t_create_date, t_close_date) FROM stdin;
+24	Retweet not wokring	Re-tweet function is creating a new tweet id	4	demo_user@gmail.com	5	Low	Closed	Functionality	15/04/2020	27/04/2020
+2	Facility Name absent	Facility Name not showing up for Owner Tab	11	demo_developer@gmail.com	2	Medium	Closed	Functionality	10/02/2020	22/02/2020
+3	Chart not switching	Chart not alternating through radio button on facility page	11	bryan@gmail.com	2	High	Closed	Functionality	10/02/2020	22/02/2020
+4	Average score is 0	Average scores for inspectors card on dashboard is 0 for all	11	bryan@gmail.com	2	Medium	Closed	Functionality	10/02/2020	22/02/2020
+5	Scoreboard has decimal values	Precision not set for scoreboard, 10 digits displayed after decimal place	11	bryan@gmail.com	2	High	Closed	Functionality	10/02/2020	22/02/2020
+6	Tile not displayed	Total inspections tile missing for Facility tab	11	bryan@gmail.com	2	Low	Closed	Functionality	10/03/2020	22/03/2020
+7	legends not displayed	Legends missing for violations pie chart on facility tab	11	bryan@gmail.com	2	Medium	Closed	Functionality	10/03/2020	22/03/2020
+8	Incorrect Aggregate	Quarter wise aggregate for average violations chart is incorrect	11	bryan@gmail.com	2	High	Closed	Functionality	10/03/2020	22/03/2020
+9	Logout button absent	Logout button absent on Facility tab	12	user_1@gmail.com	2	Medium	Closed	Functionality	10/03/2020	22/03/2020
+10	Grade Distribution	Grade distribution should be between 0 - 100	12	user_1@gmail.com	2	Low	Closed	Functionality	10/04/2020	22/04/2020
+11	Inspector landing page	Inspector Name not displayed on landing page	12	user_1@gmail.com	2	Low	Closed	Functionality	10/04/2020	22/04/2020
+12	Message Display	Simulator actor not displaying message	5	zeus@gmail.com	4	Medium	Closed	Functionality	10/09/2020	19/09/2020
+13	Re-tweet function	Re-tweet function is creating a new tweet id	5	zeus@gmail.com	4	Low	Closed	Functionality	10/09/2020	19/09/2020
+14	Duplicate tweets	Live tweets are displayed twice or thrice	5	zeus@gmail.com	4	High	Closed	Functionality	10/10/2020	19/10/2020
+15	HashTag not stored correctly	Hashtags stored with space in database	16	alice@gmail.com	4	High	Closed	Functionality	10/11/2020	19/11/2020
+16	User Mention	User mentions tweets not delivered in live messages	16	alice@gmail.com	4	Low	Closed	Functionality	10/11/2020	19/11/2020
+17	Web Sockets	Web sharper socket not working	16	alice@gmail.com	4	High	Closed	Functionality	10/11/2020	19/11/2020
+18	Project Name not displaying	List of tickets displays project id instead of project name	5	bob@gmail.com	1	Low	Closed	Functionality	23/11/2020	29/11/2020
+22	Create project for Admin	Create project functionality absent from admin page	5	demo_user@gmail.com	1	High	Closed	Functionality	15/12/2020	27/12/2020
+19	Callback URL fail	Call back url not working for Developer view	5	bob@gmail.com	1	High	Closed	Functionality	4/12/2020	12/12/2020
+20	Ticket status change	Developer unable to change ticket status	4	demo_user@gmail.com	1	Medium	Closed	Functionality	4/12/2020	12/12/2020
+21	Permanent Notifications 	Notifications not disappearing after viewing them	5	demo_user@gmail.com	1	Low	Closed	Functionality	4/12/2020	12/12/2020
+1	Avg violation graph flicker	Average violations graph on the owner dashboard flickers	11	demo_developer@gmail.com	2	Medium	Closed	Front-End	01/02/2020	22/02/2020
+23	Actor not working	Simulator actor not displaying message	4	demo_user@gmail.com	5	Low	Closed	Functionality	15/04/2020	27/04/2020
+25	Chart not switching	Chart not alternating through radio button on facility page	4	demo_user@gmail.com	5	High	Progress	Functionality	15/05/2020	27/05/2020
+26	Grade Distribution	Grade distribution should be between 0 - 100	4	demo_user@gmail.com	5	High	Progress	Functionality	15/05/2020	27/05/2020
+27	User Mention	User mentions tweets not delivered in live messages	4	demo_user@gmail.com	5	Medium	Progress	Functionality	15/06/2020	27/06/2020
+28	Ticket status change	Developer unable to change ticket status	4	demo_user@gmail.com	5	High	Progress	Functionality	15/06/2020	27/06/2020
+29	Avg violation graph flicker	Average violations graph on the owner dashboard flickers	4	demo_user@gmail.com	5	Medium	Open	Functionality	15/06/2020	27/06/2020
+30	Duplicate tweets	Live tweets are displayed twice or thrice	4	demo_user@gmail.com	5	High	Open	Functionality	15/07/2020	27/07/2020
+31	Permanent Notifications	Notifications not disappearing after viewing them	4	demo_user@gmail.com	5	High	Open	Functionality	15/08/2020	27/08/2020
+32	Project Name not displaying	List of tickets displays project id instead of project name	4	demo_user@gmail.com	5	High	Open	Functionality	15/09/2020	27/09/2020
+33	Test ticket	Test whether ticket is unassinged	0	demo_user@gmail.com	5	Low	Open	Test	30/12/2020	
+\.
+
+
+--
+-- Data for Name: ticket_history; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.ticket_history (t_history_id, t_id, user_id, t_status, t_update_date, t_priority) FROM stdin;
+1	1	0	Open	01/02/2020	Medium
+2	1	11	Open	07/02/2020	Medium
+3	1	11	Progress	09/02/2020	Medium
+4	1	11	Closed	13/02/2020	Medium
+5	2	0	Open	10/02/2020	Medium
+6	2	11	Open	14/02/2020	Medium
+7	2	11	Progress	18/02/2020	Medium
+8	2	11	Closed	22/02/2020	Medium
+9	3	0	Open	10/02/2020	High
+10	3	11	Open	14/02/2020	High
+11	3	11	Progress	18/02/2020	High
+12	3	11	Closed	22/02/2020	High
+13	4	0	Open	10/02/2020	Medium
+14	4	11	Open	14/02/2020	Medium
+15	4	11	Progress	18/02/2020	Medium
+16	4	11	Closed	22/02/2020	Medium
+17	5	0	Open	10/02/2020	High
+18	5	11	Open	14/02/2020	High
+19	5	11	Progress	18/02/2020	High
+20	5	11	Closed	22/02/2020	High
+21	6	0	Open	10/03/2020	Low
+22	6	11	Open	14/03/2020	Low
+23	6	11	Progress	18/03/2020	Low
+24	6	11	Closed	22/03/2020	Low
+25	7	0	Open	10/03/2020	Medium
+26	7	11	Open	14/03/2020	Medium
+27	7	11	Progress	18/03/2020	Medium
+28	7	11	Closed	22/03/2020	Medium
+29	8	0	Open	10/03/2020	High
+30	8	11	Open	14/03/2020	High
+31	8	11	Progress	18/03/2020	High
+32	8	11	Closed	22/03/2020	High
+33	9	0	Open	10/03/2020	Medium
+34	9	12	Open	14/03/2020	Medium
+35	9	12	Progress	18/03/2020	Medium
+36	9	12	Closed	22/03/2020	Medium
+37	10	0	Open	10/04/2020	Low
+38	10	12	Open	14/04/2020	Low
+39	10	12	Progress	18/04/2020	Low
+40	10	12	Closed	22/04/2020	Low
+41	11	0	Open	10/04/2020	Low
+42	11	12	Open	14/04/2020	Low
+43	11	12	Progress	18/04/2020	Low
+44	11	12	Closed	22/04/2020	Low
+45	12	0	Open	10/09/2020	Medium
+46	12	5	Open	13/09/2020	Medium
+47	12	5	Progress	16/09/2020	Medium
+48	12	5	Closed	19/09/2020	Medium
+49	13	0	Open	10/09/2020	Low
+50	13	5	Open	13/09/2020	Low
+51	13	5	Progress	16/09/2020	Low
+52	13	5	Closed	19/09/2020	Low
+53	14	0	Open	10/010/2020	High
+54	14	5	Open	13/010/2020	High
+55	14	5	Progress	16/010/2020	High
+56	14	5	Closed	19/010/2020	High
+57	15	0	Open	10/011/2020	High
+58	15	16	Open	13/011/2020	High
+59	15	16	Progress	16/011/2020	High
+60	15	16	Closed	19/011/2020	High
+61	16	0	Open	10/011/2020	Low
+62	16	16	Open	13/011/2020	Low
+63	16	16	Progress	16/011/2020	Low
+64	16	16	Closed	19/011/2020	Low
+65	17	0	Open	10/011/2020	High
+66	17	16	Open	13/011/2020	High
+67	17	16	Progress	16/011/2020	High
+68	17	16	Closed	19/011/2020	High
+69	18	0	Open	23/011/2020	Low
+70	18	5	Open	25/011/2020	Low
+71	18	5	Progress	27/011/2020	Low
+72	18	5	Closed	29/011/2020	Low
+73	19	0	Open	4/12/2020	High
+74	19	5	Open	6/12/2020	High
+75	19	5	Progress	8/12/2020	High
+76	19	5	Closed	10/12/2020	High
+77	20	0	Open	4/12/2020	Medium
+78	20	4	Open	6/12/2020	Medium
+79	20	4	Progress	8/12/2020	Medium
+80	20	4	Closed	10/12/2020	Medium
+81	21	0	Open	4/12/2020	Low
+82	21	5	Open	6/12/2020	Low
+83	21	5	Progress	8/12/2020	Low
+84	21	5	Closed	10/12/2020	Low
+85	22	0	Open	15/12/2020	High
+86	22	5	Open	19/12/2020	High
+87	22	5	Progress	23/12/2020	High
+88	22	5	Closed	27/12/2020	High
+89	23	0	Open	15/04/2020	Low
+90	23	4	Open	19/04/2020	Low
+91	23	4	Progress	23/04/2020	Low
+92	23	4	Closed	27/04/2020	Low
+93	24	0	Open	15/04/2020	Low
+94	24	4	Open	19/04/2020	Low
+95	24	4	Progress	23/04/2020	Low
+96	24	4	Closed	27/04/2020	Low
+97	25	0	Open	15/05/2020	High
+98	25	4	Open	19/05/2020	High
+99	25	4	Progress	23/05/2020	High
+101	26	0	Open	15/05/2020	High
+102	26	4	Open	19/05/2020	High
+103	26	4	Progress	23/05/2020	High
+105	27	0	Open	15/06/2020	Medium
+106	27	4	Open	19/06/2020	Medium
+107	27	4	Progress	23/06/2020	Medium
+109	28	0	Open	15/06/2020	High
+110	28	4	Open	19/06/2020	High
+111	28	4	Progress	23/06/2020	High
+113	29	0	Open	15/06/2020	Medium
+114	29	4	Open	19/06/2020	Medium
+117	30	0	Open	15/07/2020	High
+118	30	4	Open	19/07/2020	High
+121	31	0	Open	15/08/2020	High
+122	31	4	Open	19/08/2020	High
+125	32	0	Open	15/09/2020	High
+126	32	4	Open	19/09/2020	High
+127	32	4	Progress	23/09/2020	High
+128	32	4	Closed	27/09/2020	High
+129	33	0	Open	30/12/2020	Low
+\.
+
+
+--
+-- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.users (user_id, user_name, user_email, user_pwd, user_role, update_date) FROM stdin;
+1	Admin	admin@gmail.com	All	Admin	01/01/2020
+2	Demo_user	demo_user@gmail.com	bugTracker123	User	27/12/2020
+3	Demo_Manager	demo_manager@gmail.com	bugTracker123	Project Manager	27/12/2020
+4	Demo_Developer	demo_developer@gmail.com	bugTracker123	Developer	27/12/2020
+5	Alice	alice@gmail.com	bugTracker123	Developer	27/12/2020
+6	Bob	bob@gmail.com	bugTracker123	Developer	27/12/2020
+7	Sam	sam@gmail.com	bugTracker123	User	27/12/2020
+8	Josh	josh@gmail.com	bugTracker123	Developer	27/12/2020
+9	Adam	adam@gmail.com	bugTracker123	Developer	27/12/2020
+10	Eve	eve@gmail.com	bugTracker123	User	27/12/2020
+12	Bryan	bryan@gmail.com	bugTracker123	Developer	27/12/2020
+13	Caine	caine@gmail.com	bugTracker123	Developer	27/12/2020
+15	Jane	jane@gmail.com	bugTracker123	Project Manager	27/12/2020
+16	Noa	noa@gmail.com	bugTracker123	Developer	27/12/2020
+18	Zeus	zeus@gmail.com	bugTracker123	User	27/12/2020
+11	dev_1	dev_1@gmail.com	bugTracker123	Developer	27/12/2020
+14	user_1	user_1@gmail.com	bugTracker123	User	27/12/2020
+19	Demo_Admin	demo_admin@gmail.com	demo	Admin	20/12/2020
+20	test_user1	test_user1@gmail.com	bugTracker123	User	13/02/2020
+21	test_user2	test_user2@gmail.com	bugTracker123	User	13/02/2020
+22	test_dev1	test_dev1@gmail.com	bugTracker123	Developer	13/02/2020
+23	test_dev2	test_dev2@gmail.com	bugTracker123	Developer	13/02/2020
+17	Thesa	thesa@gmail.com	bugTracker123	Developer	20/12/2020
+\.
+
+
+--
+-- Name: comment_c_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.comment_c_id_seq', 10, true);
+
+
+--
+-- Name: map_user_proj_map_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.map_user_proj_map_id_seq', 38, true);
+
+
+--
+-- Name: month_config_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.month_config_id_seq', 1, false);
+
+
+--
+-- Name: notification_n_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.notification_n_id_seq', 44, true);
+
+
+--
+-- Name: project_p_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.project_p_id_seq', 1, false);
+
+
+--
+-- Name: ticket_history_t_history_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.ticket_history_t_history_id_seq', 4, true);
+
+
+--
+-- Name: ticket_t_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.ticket_t_id_seq', 1, false);
+
+
+--
+-- Name: users_user_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.users_user_id_seq', 1, false);
+
+
+--
+-- Name: alembic_version alembic_version_pkc; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.alembic_version
+    ADD CONSTRAINT alembic_version_pkc PRIMARY KEY (version_num);
+
+
+--
+-- Name: comment comment_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.comment
+    ADD CONSTRAINT comment_pkey PRIMARY KEY (c_id);
+
+
+--
+-- Name: map_user_proj map_user_proj_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.map_user_proj
+    ADD CONSTRAINT map_user_proj_pkey PRIMARY KEY (map_id);
+
+
+--
+-- Name: month_config month_config_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.month_config
+    ADD CONSTRAINT month_config_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: notification notification_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.notification
+    ADD CONSTRAINT notification_pkey PRIMARY KEY (n_id);
+
+
+--
+-- Name: project project_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.project
+    ADD CONSTRAINT project_pkey PRIMARY KEY (p_id);
+
+
+--
+-- Name: ticket_history ticket_history_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.ticket_history
+    ADD CONSTRAINT ticket_history_pkey PRIMARY KEY (t_history_id);
+
+
+--
+-- Name: ticket ticket_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.ticket
+    ADD CONSTRAINT ticket_pkey PRIMARY KEY (t_id);
+
+
+--
+-- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.users
+    ADD CONSTRAINT users_pkey PRIMARY KEY (user_id);
+
+
+--
+-- PostgreSQL database dump complete
+--
+

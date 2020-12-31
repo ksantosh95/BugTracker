@@ -96,16 +96,17 @@ success:(data) => {
 
 	var data_points = 	[]
 	var color_buffer = 100 / data.project_list.length
+	
+	var array_color = ["#b2b266","#4e73df","#ff6666","#d2ff4d","#ffbb33","#adad85"]
 
-
-
+	var counter = 0 ;
 	for(i in data.project_list)
 		{
 			var r_quotient = 62 + color_buffer;
 			var g_quotient = 28 + color_buffer;
 			var b_quotient = 118 + color_buffer;
-			var light_color_scheme = "rgba("+r_quotient+" , "+g_quotient+" , "+b_quotient+" , 0.05)"
-			var heavy_color_scheme = "rgba("+r_quotient+" , "+g_quotient+" , "+b_quotient+" , 1)"
+			var light_color_scheme = "rgba("+r_quotient+" , "+g_quotient+" , "+b_quotient+" , 0)"
+			var heavy_color_scheme = array_color[counter]
 			var project_data_points = []
 			var label_points = []
 			for(j=0; j< data.chart_data.length; j++)
@@ -136,7 +137,7 @@ success:(data) => {
 			})
 
 			color_buffer = color_buffer + color_buffer
-			
+			counter = counter + 1;
 				}
 			
 	// Area Chart Example
@@ -269,7 +270,7 @@ var myPieChart = new Chart(ctx, {
     labels: label_points,
     datasets: [{
       data: data_points,
-      backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc'],
+      backgroundColor: ['#4e73df', '#ffbb33', '#36b9cc'],
       hoverBackgroundColor: ['#2e59d9', '#17a673', '#2c9faf'],
       hoverBorderColor: "rgba(234, 236, 244, 1)",
     }],

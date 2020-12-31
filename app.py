@@ -7,9 +7,9 @@ from authlib.integrations.flask_client import OAuth
 from six.moves.urllib.parse import urlencode
 
 app = Flask(__name__, template_folder='template')
-app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://postgres:postgres@localhost:5432/bugtrackerdb"
+#app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://postgres:postgres@localhost:5432/bugtrackerdb"
 # FOR HEROKU DATABASE
-#app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 app.secret_key = "asdfsdfsd"
@@ -36,11 +36,11 @@ oauth = OAuth(app)
 
 auth0 = oauth.register(
     'auth0',
-    client_id=AUTH0_CLIENT_ID,
-    client_secret=AUTH0_CLIENT_SECRET,
-    api_base_url=AUTH0_BASE_URL,
-    access_token_url=AUTH0_BASE_URL + '/oauth/token',
-    authorize_url=AUTH0_BASE_URL + '/authorize',
+    client_id= AUTH0_CLIENT_ID,
+    client_secret= AUTH0_CLIENT_SECRET,
+    api_base_url= AUTH0_BASE_URL,
+    access_token_url= AUTH0_BASE_URL + '/oauth/token',
+    authorize_url= AUTH0_BASE_URL + '/authorize',
     client_kwargs={
         'scope': 'openid profile email',
     },
@@ -119,11 +119,20 @@ def redirect_users():
 
 @app.errorhandler(500)
 def error_500(error):
-    return jsonify({
-    'success': False,
-    'error': 500,
-    'message': 'Server side error'
-    }), 500
+    userinfo = session.get('profile')
+    notification_list = NotificationController.get_notifications(userinfo['user_id'])
+    notification_count = len(notification_list)
+    data = {
+        "userinfo" : userinfo,
+        "user_id": userinfo['user_id'],
+        "role" : userinfo['role'],
+        "username" : userinfo['nickname'],
+        "page" : "Unauthorized",
+        "error" : "500",
+        "notification" : notification_list,
+        "notification_count" : notification_count,
+    }
+    return render_template('Unauthorized.html', data = data)
 
 
 
@@ -158,6 +167,25 @@ def error_401(error):
         "username" : userinfo['nickname'],
         "page" : "Unauthorized",
         "error" : "401",
+        "notification" : notification_list,
+        "notification_count" : notification_count,
+    }
+    return render_template('Unauthorized.html', data = data)
+
+
+@app.errorhandler(403)
+def error_403(error):
+    userinfo = session.get('profile')
+    notification_list = NotificationController.get_notifications(userinfo['user_id'])
+    notification_count = len(notification_list)
+
+    data = {
+        "userinfo" : userinfo,
+        "user_id": userinfo['user_id'],
+        "role" : userinfo['role'],
+        "username" : userinfo['nickname'],
+        "page" : "Unauthorized",
+        "error" : "403",
         "notification" : notification_list,
         "notification_count" : notification_count,
     }

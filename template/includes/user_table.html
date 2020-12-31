@@ -44,9 +44,13 @@
 													<a href="/admin/edit-user/{{u.id}}" >
 													Edit
 													</a>&nbsp &nbsp
-													<a href="/admin/delete-user/{{u.id}}" >
-													Delete
-													</a>
+														{% if not data.is_valid_remove and data.userinfo.user_id != 1 %}
+														Delete
+														{% else %}
+														<a href="/admin/delete-user/{{u.id}}" >
+														Delete
+														</a>
+														{% endif %}
 													{% elif data.page == 'user-list'%}
 													<a href="/admin/userdetails/{{u.id}}" >
 													Manage

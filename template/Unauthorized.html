@@ -28,6 +28,14 @@
 					{% if data.error == '401' %}
 					&nbsp &nbsp<h2>401 Unauthorized</h2>
 					<b>You are not authorized to access this page! </b>
+					
+					{% elif data.error == '500' %}
+					&nbsp &nbsp<h2>Server Side Error</h2>
+		
+					{% elif data.error == '403' %}
+					&nbsp &nbsp<h2>Forbidden</h2>
+					<b>Users with user id less than 20 cannot be deleted </b>
+					
 					{% elif data.error == '404' %}
 					&nbsp &nbsp<h2>Error 404</h2>
 					<b>Page not found </b>

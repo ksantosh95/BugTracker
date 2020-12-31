@@ -21,6 +21,7 @@ from models.UsersModel import Users
 from models.TicketModel import Ticket
 
 from controllers import NotificationController
+from controllers import AdminController
 
 def project_user_list_to_json(self):
     return {
@@ -69,6 +70,11 @@ def get_project_details(project_id):
                     .filter(Map_user_proj.p_id == project_id).all()
     project_users =  [project_user_list_to_json(row) for row in project_users_list]
 
+    for u in project_users:
+        valid_delete = AdminController.is_valid_remove(u['user_id'])    
+        u['valid_delete'] = valid_delete
+
+
     project_tickets_list = Ticket.query.join(Users, Ticket.assigned_user_id == Users.user_id, isouter=True )\
                         .add_columns(Ticket.t_id,Ticket.t_title,Ticket.t_desc, Users.user_name.label('assigned_user_id'), \
                             Ticket.submitter_email, Ticket.p_id, Ticket.t_priority, Ticket.t_status, Ticket.t_type,\
@@ -76,12 +82,20 @@ def get_project_details(project_id):
                         .filter(Ticket.p_id == project_id).all()
     project_tickets =  [Ticket.json_format(row) for row in project_tickets_list]
 
-    user_list = Users.query.filter(Users.user_role != "Admin").all()
-    user_list_json = [Users.json_format(u) for u in user_list]  
+    #user_list = Users.query.filter(Users.user_role != "Admin").all()
+    sql = text("""select user_id, user_name,user_email
+                    ,user_pwd,user_role,update_date from users 
+                    where user_role!='Admin' and user_id not in (select user_id from map_user_proj where p_id ="""+str(project_id)+""")""")
+    result = db.session.execute(sql)
+    users = [row for row in result]
+    user_list_json = [Users.json_format(u) for u in users]  
+
 
     #Get notifications
     notification_list = NotificationController.get_notifications(userinfo['user_id'])
     notification_count = len(notification_list)
+
+    
 
     data = {
         "project" :project,

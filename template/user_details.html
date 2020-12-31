@@ -103,7 +103,12 @@
 												<td>{{ proj.p_id }}</td>
 												<td>{{ proj.p_name }}</td>
 												<td>{% for u in data.user %}
-													<a href="/admin/delete-project-user/?user_id={{u.id}}&project_id={{proj.p_id}}" >Remove</a></td>
+														{% if not data.is_valid_remove and data.userinfo.user_id != 1 %}
+														Remove
+														
+														{% else %}
+														<a href="/admin/delete-project-user/?user_id={{u.id}}&project_id={{proj.p_id}}" >Remove</a></td>
+														{%endif%}
 													{% endfor %}
 											</tr>
 										{% endfor %}    

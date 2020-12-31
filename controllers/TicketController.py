@@ -324,7 +324,7 @@ def update_ticket():
     ticket_entry.t_type = t_type
 
     if t_status == "Closed":
-        ticket_entry.t_close_date = t_type
+        ticket_entry.t_close_date = constants.CURRENT_DATE
 
     try:
         ticket_entry.update()
