@@ -43,6 +43,8 @@ from controllers import NotificationController
 @app.route('/admin/user-list', methods=['GET'])
 def admin_get_users():
     userinfo = session.get('profile')
+    if userinfo['role']!= 'Admin':
+        abort(401)
     user_list = Users.query.filter(Users.user_role != "Admin").all()
     user = [Users.json_format(u) for u in user_list]  
     data = {
@@ -61,6 +63,8 @@ def admin_get_users():
 @app.route("/admin/create-user")
 def create_user():
     userinfo = session.get('profile')  
+    if userinfo['role']!= 'Admin':
+        abort(401)
     project_name_list = Project.query.all()
     project_name_list_json = [Project.json_format(row) for row in project_name_list]
     data = {
@@ -118,6 +122,8 @@ def submit_user():
 @app.route("/admin/edit-user/<int:user_id>")
 def get_user_info(user_id):
     userinfo = session.get('profile')  
+    if userinfo['role']!= 'Admin':
+        abort(401)
     user_entry = Users.query.get(user_id)
     user = Users.json_format(user_entry)
     project = Project.query.join(Map_user_proj, Project.p_id == Map_user_proj.p_id)\
@@ -172,6 +178,8 @@ def delete_user(user_id):
 @app.route("/admin/userdetails/<int:user_id>")
 def get_user_history(user_id):
     userinfo = session.get('profile')
+    if userinfo['role']!= 'Admin':
+        abort(401)
     userentry = Users.query.get(user_id)
     user = Users.json_format(userentry)
     user_project_list = Project.query.join(Map_user_proj, Project.p_id == Map_user_proj.p_id)\
@@ -228,6 +236,8 @@ def get_user_history(user_id):
 def assign_user_to_project():
     input_type= request.form.get('input')
     userinfo = session.get('profile')
+    if userinfo['role']!= 'Admin':
+        abort(401)
     user_id = request.form.get('user_id')
     project_id = request.form.get('project')
     role = request.form.get('role')
@@ -257,6 +267,9 @@ def assign_user_to_project():
 #################################################################################################
 @app.route("/admin/delete-project-user/")
 def delete_project_user():
+    userinfo = session.get('profile')
+    if userinfo['role']!= 'Admin':
+        abort(401)
     user_id = request.args.get('user_id')
     project_id = request.args.get('project_id')
     map= Map_user_proj.query.filter(Map_user_proj.user_id == user_id).filter(Map_user_proj.p_id == project_id).one()
@@ -269,6 +282,9 @@ def delete_project_user():
 #################################################################################################
 @app.route("/admin/delete-project-user-project-details/")
 def delete_project_user_projectdetails():
+    userinfo = session.get('profile')
+    if userinfo['role']!= 'Admin':
+        abort(401)
     user_id = request.args.get('user_id')
     project_id = request.args.get('project_id')
     map= Map_user_proj.query.filter(Map_user_proj.user_id == user_id).filter(Map_user_proj.p_id == project_id).one()
@@ -282,7 +298,8 @@ def delete_project_user_projectdetails():
 @app.route('/admin/projects', methods=['GET'])
 def admin_get_projects():
     userinfo = session.get('profile')
-
+    if userinfo['role']!= 'Admin':
+        abort(401)
     query_for_project  = text(""" SELECT proj.p_id         AS p_id, 
                                     proj.p_name       AS p_name, 
                                     proj.p_desc       AS p_desc, 
@@ -316,6 +333,8 @@ def admin_get_projects():
 @app.route('/admin/tickets', methods=['GET'])
 def admin_get_tickets():
     userinfo = session.get('profile')
+    if userinfo['role']!= 'Admin':
+        abort(401)
     ticket_value = Ticket.query.join(Project, Ticket.p_id == Project.p_id)\
                     .add_columns(Ticket.t_id.label('id'),Ticket.t_title.label('title'), Ticket.t_desc.label('desc'), \
                         Ticket.assigned_user_id.label('user_id'), Project.p_name.label('p_id')\
@@ -337,6 +356,9 @@ def admin_get_tickets():
 #################################################################################################
 @app.route("/admin/delete-ticket/<int:ticket_id>")
 def admin_delete_ticket(ticket_id):
+    userinfo = session.get('profile')
+    if userinfo['role']!= 'Admin':
+        abort(401)
     ticket = Ticket.query.get(ticket_id)
     try:
         ticket.delete()
@@ -352,7 +374,9 @@ def admin_delete_ticket(ticket_id):
 #################################################################################################
 @app.route("/admin/edit-ticket/<int:ticket_id>")
 def get_ticket_info(ticket_id):
-    userinfo = session.get('profile')  
+    userinfo = session.get('profile')
+    if userinfo['role']!= 'Admin':
+        abort(401) 
     ticket_json = Ticket.query.get(ticket_id)
     ticket = Ticket.json_format(ticket_json) 
     project = Project.query.get(ticket_json.p_id)
@@ -379,7 +403,9 @@ def get_ticket_info(ticket_id):
 #################################################################################################
 @app.route("/admin/create-project")
 def create_project():
-    userinfo = session.get('profile')  
+    userinfo = session.get('profile')
+    if userinfo['role']!= 'Admin':
+        abort(401)  
 
     data = {
         "userinfo" : userinfo,
@@ -398,6 +424,9 @@ def create_project():
 #################################################################################################
 @app.route("/admin/project-submit", methods=['POST'])
 def submit_project():
+    userinfo = session.get('profile')
+    if userinfo['role']!= 'Admin':
+        abort(401)
     proj_name = request.form.get('proj_name')
     proj_desc = request.form.get('proj_desc')
     today = date.today()

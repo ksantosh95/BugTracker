@@ -31,6 +31,8 @@ from controllers import TicketController
 @app.route('/dev/tickets', methods=['GET'])
 def dev_get_tickets():
     userinfo = session.get('profile')
+    if userinfo['role']!= 'Developer':
+        abort(401)
     dev_email= userinfo['name']
     sql = text("""SELECT tick.t_id, 
                     tick.t_title, 
@@ -86,6 +88,8 @@ def dev_get_tickets():
 @app.route('/dev/projects', methods=['GET'])
 def dev_get_projects():
     userinfo = session.get('profile')
+    if userinfo['role']!= 'Developer':
+        abort(401)
     dev_email= userinfo['email']
     project_list = Project.query.join(Map_user_proj, Project.p_id == Map_user_proj.p_id)\
 				.join(Users, Users.user_id == Map_user_proj.user_id)\
@@ -111,10 +115,13 @@ def dev_get_projects():
 @app.route('/dev/assignedtickets', methods=['GET'])
 def get_dev_assigned_tickets():
     userinfo = session.get('profile')
+    if userinfo['role']!= 'Developer':
+        abort(401)
     dev_email= userinfo['email']
     ticket_list = Ticket.query.join(Users, Ticket.assigned_user_id == Users.user_id)\
+                    .join(Project, Ticket.p_id == Project.p_id)\
                     .add_columns(Ticket.t_id, Ticket.t_title, Ticket.t_desc, Ticket.assigned_user_id, Ticket.submitter_email,\
-                        Ticket.p_id, Ticket.t_priority, Ticket.t_status, Ticket.t_type, Ticket.t_create_date, Ticket.t_close_date)\
+                        Project.p_name.label('p_id'), Ticket.t_priority, Ticket.t_status, Ticket.t_type, Ticket.t_create_date, Ticket.t_close_date)\
                             .filter(Users.user_email == dev_email)\
                                 .filter(Users.user_role== 'Developer').all()
     ticket = [Ticket.json_format(tick) for tick in ticket_list]  
@@ -145,12 +152,8 @@ def get_dev_assigned_tickets():
 def get_dev_submitted_tickets():
     ticket = TicketController.get_submitted_tickets()
     userinfo = session.get('profile')
-    today = date.today()
-    t_create_date = today.strftime("%d/%m/%Y")
-    d1 = datetime.strptime(t_create_date, '%d/%m/%Y')
-    for t in ticket:
-        d2 = datetime.strptime(t['create_date'], '%d/%m/%Y')
-        t['datediff'] = abs((d2 - d1).days)
+    if userinfo['role']!= 'Developer':
+        abort(401)
     #Get notifications
     notification_list = NotificationController.get_notifications(userinfo['user_id'])
     notification_count = len(notification_list)

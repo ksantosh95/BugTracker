@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    {%- include('/includes/head.html') %}
+	
+	<title>Unauthorized</title>
+
+
+</head>
+
+<body id="page-top">
+
+    <!-- Page Wrapper -->
+    <div id="wrapper">
+
+        {%- include('/includes/sidebar.html') %}
+
+        <!-- Content Wrapper -->
+        <div id="content-wrapper" class="d-flex flex-column">
+
+            <!-- Main Content -->
+            <div id="content">
+			{%- include('/includes/topbar.html') %}
+			
+				<div class="ml-4">
+					{% if data.error == '401' %}
+					&nbsp &nbsp<h2>401 Unauthorized</h2>
+					<b>You are not authorized to access this page! </b>
+					{% elif data.error == '404' %}
+					&nbsp &nbsp<h2>Error 404</h2>
+					<b>Page not found </b>
+					{% endif %}
+				</div>
+            </div>
+            <!-- End of Main Content -->
+
+             {%- include('/includes/footer.html') %}
+
+        </div>
+        <!-- End of Content Wrapper -->
+
+    </div>
+    <!-- End of Page Wrapper -->
+
+    <!-- Scroll to Top Button-->
+    <a class="scroll-to-top rounded" href="#page-top">
+        <i class="fas fa-angle-up"></i>
+    </a>
+
+    {%- include('/includes/logout_prompt.html') %}
+
+    {%- include('/includes/js_imports.html') %}
+
+</body>
+
+</html>

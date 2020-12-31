@@ -55,6 +55,11 @@ def redirect_projects():
 @app.route("/projectdetails/<int:project_id>")
 def get_project_details(project_id):
     userinfo = session.get('profile')
+    #Check if the request is valid
+    authorized_personnel = Map_user_proj.query.with_entities(Map_user_proj.user_id).filter(Map_user_proj.p_id == project_id)\
+                            .filter(Map_user_proj.user_id ==userinfo['user_id']).all()
+    if len(authorized_personnel) == 0 and userinfo['role'] != 'Admin':
+        abort(401)
 
     project_list = Project.query.get(project_id)
     project = Project.json_format(project_list)

@@ -15,7 +15,9 @@ from datetime import date
 
 
 from models.TicketModel import Ticket
+from models.ProjectModel import Project
 from controllers import NotificationController
+
 
 #################################################################################################
 #    FETCH TICKETS SUBMITTED BY THE USER                                                        #
@@ -23,9 +25,15 @@ from controllers import NotificationController
 @app.route('/user/tickets', methods=['GET'])
 def user_get_tickets():
     userinfo = session.get('profile')
-    ticket_value = Ticket.query.filter_by(submitter_email= userinfo['email']).all()
-    ticket_value = [t.json_format() for t in ticket_value]
+    if userinfo['role']!= 'User':
+        abort(401)
 
+    ticket_value = Ticket.query.join(Project, Ticket.p_id == Project.p_id)\
+                    .add_columns(Ticket.t_id.label('id'),Ticket.t_title.label('title'), Ticket.t_desc.label('desc'), \
+                        Ticket.assigned_user_id.label('user_id'), Project.p_name.label('p_id')\
+                        ,Ticket.t_priority.label('priority'), Ticket.t_status.label('status'),Ticket.t_type.label('type')\
+                            ,Ticket.t_create_date.label('create_date'), Ticket.t_close_date.label('close_date'))\
+                                .filter(Ticket.submitter_email == userinfo['email']).all()
     notification_list = NotificationController.get_notifications(userinfo['user_id'])
     data = {
         "ticket" : ticket_value,

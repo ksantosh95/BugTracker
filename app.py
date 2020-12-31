@@ -126,5 +126,42 @@ def error_500(error):
     }), 500
 
 
+
+@app.errorhandler(404)
+def error_404(error):
+    userinfo = session.get('profile')
+    notification_list = NotificationController.get_notifications(userinfo['user_id'])
+    notification_count = len(notification_list)
+    data = {
+        "userinfo" : userinfo,
+        "user_id": userinfo['user_id'],
+        "role" : userinfo['role'],
+        "username" : userinfo['nickname'],
+        "page" : "Unauthorized",
+        "error" : "404",
+        "notification" : notification_list,
+        "notification_count" : notification_count,
+    }
+    return render_template('Unauthorized.html', data = data)
+
+
+@app.errorhandler(401)
+def error_401(error):
+    userinfo = session.get('profile')
+    notification_list = NotificationController.get_notifications(userinfo['user_id'])
+    notification_count = len(notification_list)
+
+    data = {
+        "userinfo" : userinfo,
+        "user_id": userinfo['user_id'],
+        "role" : userinfo['role'],
+        "username" : userinfo['nickname'],
+        "page" : "Unauthorized",
+        "error" : "401",
+        "notification" : notification_list,
+        "notification_count" : notification_count,
+    }
+    return render_template('Unauthorized.html', data = data)
+
 if __name__ == '__main__':
     app.run()

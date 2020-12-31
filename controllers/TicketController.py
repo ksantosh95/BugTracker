@@ -136,6 +136,17 @@ def submit_ticket():
 
 @app.route("/ticketdetails/<int:ticket_id>")
 def get_ticket_details(ticket_id):
+    userinfo = session.get('profile')
+    #Check whether the request is valid
+    authorized_personnel = Map_user_proj.query.join(Ticket, Map_user_proj.p_id == Ticket.p_id)\
+                            .add_columns(Map_user_proj.user_id).filter(Map_user_proj.user_id== userinfo['user_id'])\
+                                .filter(Ticket.t_id == ticket_id).all()
+
+    if len(authorized_personnel) == 0 and userinfo['role'] != 'Admin':
+        abort(401)
+
+
+
     result = Ticket_history.query.join(Users, Ticket_history.user_id == Users.user_id, isouter=True)\
             .add_columns(Ticket_history.t_id, Users.user_name.label('user_id'), Ticket_history.t_status, Ticket_history.t_update_date\
                 ,Ticket_history.t_priority)\
@@ -143,7 +154,7 @@ def get_ticket_details(ticket_id):
     ticket_history_list = [row for row in result]
     ticket_history = [Ticket_history.json_format(row) for row in ticket_history_list]
 
-    userinfo = session.get('profile')
+    
 
     #SELECT TICKET INFORMATION FOR TICKET_ID. SELECT PROJECT NAME AS 'P_ID'
     sql_ticket = text(""" SELECT tick.t_id, 
@@ -179,20 +190,26 @@ def get_ticket_details(ticket_id):
                 .add_columns(Users.user_name, Users.user_id)\
                 .filter(Ticket.t_id == ticket_id).filter(Map_user_proj.user_role == 'Developer').all()
 
+    assigned_dev_id = Ticket.query.with_entities(Ticket.assigned_user_id).filter(Ticket.t_id == ticket_id).all()
+
     #Get notifications
     notification_list = NotificationController.get_notifications(userinfo['user_id'])
     notification_count = len(notification_list)
+
+
     data = {
         "ticket" : ticket,
         "ticket_history" : ticket_history,
         "userinfo" : userinfo,
+        "user_id": userinfo['user_id'],
         "role" : userinfo['role'],
         "username" : userinfo['nickname'],
         "page" : "ticket_detail",
         "comment" : comment,
         "dev_list" : dev_list,
         "notification" : notification_list,
-        "notification_count" : notification_count
+        "notification_count" : notification_count,
+        "assigned_dev":assigned_dev_id[0][0]
     }
     return render_template('ticket_details.html', data = data )
 
@@ -361,7 +378,7 @@ def update_project_status():
     userinfo = session.get('profile')
     ticket_id = request.form.get('ticket_id')
     ticket_entry = Ticket.query.get(ticket_id)
-    today = date.today()
+    #today = date.today()
     #t_update_date = today.strftime("%d/%m/%Y")
     t_update_date = constants.CURRENT_DATE
     t_status = request.form.get('input')
@@ -419,6 +436,10 @@ def update_project_status():
 
 def get_submitted_tickets():
     userinfo = session.get('profile')
-    ticket_list = Ticket.query.filter_by(submitter_email= userinfo['email']).all()
-    ticket = [Ticket.json_format(t) for t in ticket_list]  
+    ticket = Ticket.query.join(Project, Ticket.p_id == Project.p_id)\
+                    .add_columns(Ticket.t_id.label('id'),Ticket.t_title.label('title'), Ticket.t_desc.label('desc'), \
+                        Ticket.assigned_user_id.label('user_id'), Project.p_name.label('p_id')\
+                        ,Ticket.t_priority.label('priority'), Ticket.t_status.label('status'),Ticket.t_type.label('type')\
+                            ,Ticket.t_create_date.label('create_date'), Ticket.t_close_date.label('close_date'))\
+                                .filter(Ticket.submitter_email == userinfo['email']).all()
     return ticket

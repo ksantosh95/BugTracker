@@ -63,18 +63,19 @@
 											<!-- STATUS -->
 											{% if data.page == 'ticket_detail' and (data.role=='Developer' or data.role=='Project Manager')%}
 												{% if t.status =='Open' %}
-													<td ><button id="myBtn" class="open_btn  ml-2 mr-2 mt-1 mb-1">{{ t.status }}</button></td>
+													<td ><button id="myBtn" class="open-click-button  ml-2 mr-2 mt-1 mb-1">{{ t.status }}</button></td>
 												{% elif t.status == 'Progress' %}
-													<td ><button id="myBtn" class="progress_btn  ml-2 mr-2 mt-1 mb-1">{{ t.status }}</button></td>
+													<td ><button id="myBtn" class="progress-click-button  ml-2 mr-2 mt-1 mb-1">{{ t.status }}</button></td>
 												{% elif t.status == 'Closed' %}
-													<td ><button id="myBtn" class="closed_btn  ml-2 mr-2 mt-1 mb-1">{{ t.status }}</button></td>
+													<td ><button id="myBtn" class="closed-click-button  ml-2 mr-2 mt-1 mb-1">{{ t.status }}</button></td>
 												{% endif %}
 												
 												<!-- The Popup -->
 													<div id="myModal" class="modal1">
-
+													
 													  <!-- Popup content -->
 													  <div class="modal-content-1">
+													  {% if data.assigned_dev == data.user_id%}
 														<form action="/update-ticket-status" method="POST" class="form-container">
 
 															<br/>
@@ -89,8 +90,12 @@
 															</div>
 															</fieldset>
 														 </form>
+														 {% else %}
+														 Only personnel assigned to this ticket can change status!
+														 {% endif %}
 													  </div>
-
+														
+														
 													</div>
 												
 												

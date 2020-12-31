@@ -11500,3 +11500,66 @@ body.sidebar-toggled footer.sticky-footer {
 	margin-left: auto;
     margin-right: auto;
 }
+
+.closed-click-button {
+  padding: 10px 10px;
+  font-size: 12px;
+  text-align: center;
+  cursor: pointer;
+  outline: none;
+  color: #fff;
+  background-color: #4CAF50;
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0 2px #999;
+}
+
+.closed-click-button:hover {background-color: #3e8e41}
+
+.closed-click-button:active {
+  background-color: #3e8e41;
+  box-shadow: 0 5px #666;
+  transform: translateY(4px);
+}
+
+.open-click-button {
+  padding: 10px 10px;
+  font-size: 12px;
+  text-align: center;
+  cursor: pointer;
+  outline: none;
+  color: #fff;
+  background-color: #43609B;
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0 2px #999;
+}
+
+.open-click-button:hover {background-color: #3e8e41}
+
+.open-click-button:active {
+  background-color: #3e8e41;
+  box-shadow: 0 5px #666;
+  transform: translateY(4px);
+}
+
+.progress-click-button {
+  padding: 10px 10px;
+  font-size: 12px;
+  text-align: center;
+  cursor: pointer;
+  outline: none;
+  color: #fff;
+  background-color: #F6EF24;
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0 2px #999;
+}
+
+.progress-click-button:hover {background-color: #3e8e41}
+
+.progress-click-button:active {
+  background-color: #3e8e41;
+  box-shadow: 0 5px #666;
+  transform: translateY(4px);
+}

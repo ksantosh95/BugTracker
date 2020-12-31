@@ -32,6 +32,9 @@ from controllers import TicketController
 @app.route('/manager-dashboard')
 def get_manager_mainpage():
     userinfo = session.get('profile')
+
+    if userinfo['role']!= 'Project Manager':
+        abort(401)
     manager_email = userinfo['email']
     user_id = userinfo['user_id']
     #Get notifications
@@ -63,6 +66,8 @@ def get_manager_mainpage():
 @app.route('/manager/tickets', methods=['GET'])
 def manager_get_tickets():
     userinfo = session.get('profile')
+    if userinfo['role']!= 'Project Manager':
+        abort(401)
     manager_email= userinfo['name']
     sql = text("""SELECT tick.t_id, 
                     tick.t_title, 
@@ -121,7 +126,8 @@ def manager_get_tickets():
 def get_manager_submitted_tickets():
     ticket = TicketController.get_submitted_tickets()
     userinfo = session.get('profile')
-
+    if userinfo['role']!= 'Project Manager':
+        abort(401)
     #Get notifications
     notification_list = NotificationController.get_notifications(userinfo['user_id'])
     notification_count = len(notification_list)
@@ -143,6 +149,8 @@ def get_manager_submitted_tickets():
 @app.route('/manager/projects', methods=['GET'])
 def manager_get_projects():
     userinfo = session.get('profile')
+    if userinfo['role']!= 'Project Manager':
+        abort(401)
     manager_email= userinfo['email']
     project_list = Project.query.join(Map_user_proj, Project.p_id == Map_user_proj.p_id)\
 				.join(Users, Users.user_id == Map_user_proj.user_id)\
@@ -170,6 +178,8 @@ def manager_get_projects():
 @app.route("/manager-dashboard/project/<int:project_id>")
 def get_project_chart(project_id):
     userinfo = session.get('profile')
+    if userinfo['role']!= 'Project Manager':
+        abort(401)
     user_id = userinfo['user_id']
     mth_id = datetime.now().month
     yr = datetime.now().year
@@ -278,6 +288,8 @@ def get_project_chart(project_id):
 @app.route('/manager-dashboard-cards/<int:project_id>')
 def get_manager_mainpage_cards(project_id): 
     userinfo = session.get('profile')
+    if userinfo['role']!= 'Project Manager':
+        abort(401)
     manager_email = userinfo['email']
     user_id = userinfo['user_id']
     if project_id == 0:
@@ -372,6 +384,8 @@ def get_manager_mainpage_cards(project_id):
 @app.route('/manager-dashboard-piechart/<int:project_id>')
 def get_manager_mainpage_piechart(project_id): 
     userinfo = session.get('profile')
+    if userinfo['role']!= 'Project Manager':
+        abort(401)
     manager_email = userinfo['email']
     user_id = userinfo['user_id']
     mth_id = str(datetime.now().month)
