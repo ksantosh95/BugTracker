@@ -1,7 +1,7 @@
 <br />
 <p align="center">
-  <a href="https://bugtracker-stage.herokuapp.com/">
-    Bug Tracker
+ <a href="https://bugtracker-stage.herokuapp.com/">
+     <img src="static/img/bugtrac_logo.png" width="320" height="180">
   </a>
 
 
@@ -11,18 +11,20 @@
   </p>
 </p>
 
-<p align="center">Bug Tracking software.</p>
+<p align="center">Efficient bug tracking web application to track bugs in software development projects with role management, assignment and notification features.</p>
 
-<div align ="center">
-<h3>Features </h3>
-Notifications
-Bug labels
-</div>
+<p align="center">
+    <img src="static/img/html_logo.png" width="50" height="50"> 
+    <img src="static/img/css_logo.png" width="50" height="50">
+    <img src="static/img/flask_logo.png" width="50" height="50">
+    <img src="static/img/postgresql_logo.png" width="50" height="50">
+    <img src="static/img/heroku_logo.png" width="50" height="50">
+  
+</p>
 
-<div align ="center">
-<h3> Tech Stack </h3>
+**DEMO**
+---
 
-| Stack    | -                                                                                          | -                                                                                                 | -                                                                                          |
-| -------- | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| FrontEnd | <p align="center"><img src="static/img/html_logo.png" width="100" height="100"> <br /></p> | <p align="center"><img src="static/img/css_logo.png" width="100" height="100"> <br /></p>         | <p align="center"><img src="static/img/js_logo.png" width="100" height="100"> <br /></p>   |
-| BackEnd  | <p align="center"><img src="static/img/flask_logo.png" width="100" height="100"> <br /></p>| <p align="center"><img src="static/img/postgresql_logo.png" width="100" height="100"> <br /></p> | <p align="center"><img src="static/img/heroku_logo.png" width="100" height="100"> <br /></p>|
+
+**Features**
+---
