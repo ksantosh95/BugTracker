@@ -36,24 +36,27 @@
 **DEMO**
 ---
  <a href="https://bugtracker-stage.herokuapp.com/"> Click here </a>
+ <p align="center">
+ <img src="static/img/app/app.GIF" width="820" height="470">
+ </p>
  
  **Development Timeline**
 ---
 <p align="center">
- <img src="static/img/app/plan.JPG" width="640" height="380">
+ <img src="static/img/app/plan.JPG" width="820" height="470">
  </p>
  
 **Views**
 ---
 <p align="center">
-    <img src="static/img/app/app1.JPG" width="160" height="100"> 
-	<img src="static/img/app/app2.JPG" width="160" height="100"> 
-	<img src="static/img/app/app3.JPG" width="160" height="100"> 
-	<img src="static/img/app/app4.JPG" width="160" height="100"> 
-	<br>
-	<img src="static/img/app/app5.JPG" width="160" height="100"> 
-	<img src="static/img/app/app6.JPG" width="160" height="100"> 
-	<img src="static/img/app/app7.JPG" width="160" height="100"> 
-	<img src="static/img/app/app8.JPG" width="160" height="100"> 
+    <img src="static/img/app/app1.JPG" width="180" height="110"> &nbsp &nbsp
+	<img src="static/img/app/app2.JPG" width="180" height="110"> &nbsp &nbsp
+	<img src="static/img/app/app3.JPG" width="180" height="110"> &nbsp &nbsp
+	<img src="static/img/app/app4.JPG" width="180" height="110"> &nbsp &nbsp
+	<br><br>
+	<img src="static/img/app/app5.JPG" width="180" height="110"> &nbsp &nbsp
+	<img src="static/img/app/app6.JPG" width="180" height="110"> &nbsp &nbsp
+	<img src="static/img/app/app7.JPG" width="180" height="110"> &nbsp &nbsp
+	<img src="static/img/app/app8.JPG" width="180" height="110"> &nbsp &nbsp
   
 </p>
