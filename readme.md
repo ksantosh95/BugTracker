@@ -37,13 +37,13 @@
 ---
  <a href="https://bugtracker-stage.herokuapp.com/"> Click here </a>
  <p align="center">
- <img src="static/img/app/app.gif" width="600" height="360">
+ <img src="static/img/app/app.gif" width="520" height="300">
  </p>
  
  **Development Timeline**
 ---
 <p align="center">
- <img src="static/img/app/plan.JPG" width="820" height="470">
+ <img src="static/img/app/plan.JPG" width="640" height="360">
  </p>
  
 **Views**
