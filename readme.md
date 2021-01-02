@@ -39,18 +39,21 @@
  
  **Development Timeline**
 ---
+<p align="center">
+ <img src="static/img/app/plan.JPG" width="640" height="380">
+ </p>
  
 **Views**
 ---
 <p align="center">
-    <img src="static/img/app/app1.jpg" width="200" height="140"> 
-    <img src="static/img/app/app2.jpg" width="200" height="140"> 
-    <img src="static/img/app/app3.jpg" width="200" height="140"> 
-    <img src="static/img/app/app4.jpg" width="200" height="140"> 
+    <img src="static/img/app/app1.JPG" width="160" height="100"> 
+	<img src="static/img/app/app2.JPG" width="160" height="100"> 
+	<img src="static/img/app/app3.JPG" width="160" height="100"> 
+	<img src="static/img/app/app4.JPG" width="160" height="100"> 
 	<br>
-	<img src="static/img/app/app5.jpg" width="200" height="140"> 
-	<img src="static/img/app/app6.jpg" width="200" height="140"> 
-	<img src="static/img/app/app7.jpg" width="200" height="140"> 
-	<img src="static/img/app/app8.jpg" width="200" height="140"> 
+	<img src="static/img/app/app5.JPG" width="160" height="100"> 
+	<img src="static/img/app/app6.JPG" width="160" height="100"> 
+	<img src="static/img/app/app7.JPG" width="160" height="100"> 
+	<img src="static/img/app/app8.JPG" width="160" height="100"> 
   
 </p>
